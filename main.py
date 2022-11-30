@@ -1,4 +1,4 @@
-import tensorflow.lite as tflite
+from tflite_runtime.interpreter import Interpreter
 import cv2
 import numpy as np
 
@@ -19,7 +19,7 @@ def classify_image(image, top_k=1):
 
   # set mdoel and labels path to use
   labels = load_labels('model/labels.txt')
-  interpreter = tflite.Interpreter(model_path='model/model.tflite')
+  interpreter = Interpreter(model_path='model/model.tflite')
 
   # initialize interpreter
   interpreter.allocate_tensors()
@@ -55,7 +55,7 @@ def capture_classify(tries=5):
   img = capture_image()
   res, prob = classify_image(img)
 
-  return (res, prob, tries)
+  return (res, prob)
 
 
 
