@@ -1,4 +1,4 @@
-import tensorflow.lite as tflite
+from tflite_runtime.interpreter import Interpreter
 import cv2
 import numpy as np
 
@@ -10,7 +10,7 @@ def load_labels(path):
 def main():
 
     # load custom tflite model
-    interpreter = tflite.Interpreter(model_path='model/model.tflite')
+    interpreter = Interpreter(model_path='model/model.tflite')
 
     # load labels
     labels = load_labels('model/labels.txt')

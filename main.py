@@ -1,18 +1,31 @@
-from tflite_runtime.interpreter import Interpreter
 import cv2
 import numpy as np
+
+from tflite_runtime.interpreter import Interpreter
+from time import sleep
+from picamera import PiCamera
+
 
 # tensorflow lite
 def load_labels(path):
   with open(path, 'r') as f:
     return {i: line.strip() for i, line in enumerate(f.readlines())}
 
-def capture_image():
-    image_path='image/test.jpg'
-    img = cv2.imread(image_path)
-    img = cv2.resize(img,(224,224))
 
-    return img
+def capture_image():
+  # capture image
+  with PiCamera() as camera:
+    camera.resolution = (1024, 768)
+    camera.start_preview()
+    sleep(2)
+    camera.capture('image/test.jpg')
+    
+  # resize img
+  image_path='image/test.jpg'
+  img = cv2.imread(image_path)
+  img = cv2.resize(img,(224,224))
+  
+  return img
 
 
 def classify_image(image, top_k=1):
@@ -51,17 +64,34 @@ def classify_image(image, top_k=1):
   return (labels[label_id].split(' ')[-1], float(f'{prob * 100:.2f}'))
 
 
-def capture_classify(tries=5):
-  img = capture_image()
-  res, prob = classify_image(img)
-
-  return (res, prob)
+def check_turbidity(tries=5, delay=5):
+  
+  while True:
+    result = []
+    temp = []
+    
+    for i in range(tries):
+      
+      print(f'checking {i}')
+      img = capture_image()
+      res, prob = classify_image(img)
+      temp.append((res, prob))
+      sleep(delay)
+    
+    result = np.unique(list(map(lambda x: x[0], temp))).tolist()
+  
+    if len(result) == 1:
+      print(temp)
+      return result[0]
+    else:
+      print(temp)
+      print('inconsistent result, checking again.')
 
 
 
 
 def main():
-  print(capture_classify())
+  print(check_turbidity())
 
 
 
