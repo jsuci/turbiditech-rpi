@@ -2,3 +2,6 @@
 numpy
 pillow
 tensorflow
+opencv-python
+tflite-runtime
+picamera
