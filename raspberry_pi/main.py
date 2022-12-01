@@ -88,8 +88,6 @@ def check_turbidity(tries=5, delay=5):
       print('inconsistent result, checking again.')
 
 
-
-
 def main():
   print(check_turbidity())
 
