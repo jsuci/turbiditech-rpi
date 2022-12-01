@@ -1,5 +1,4 @@
 # Python packages required for classify_picamera.py
 numpy
-picamera
-tflite-runtime
-opencv-python
+pillow
+tensorflow
