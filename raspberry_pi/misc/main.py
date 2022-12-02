@@ -15,7 +15,7 @@ def load_labels(path):
 def capture_image():
   # capture image
   with PiCamera() as camera:
-    camera.resolution = (1024, 768)
+    camera.resolution = (500, 500)
     camera.start_preview()
     sleep(2)
     camera.capture('image/test.jpg')

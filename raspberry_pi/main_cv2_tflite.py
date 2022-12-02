@@ -1,6 +1,9 @@
 import cv2
 import numpy as np
-from tflite_runtime.interpreter import Interpreter
+# from tflite_runtime.interpreter import Interpreter
+import tensorflow as tf
+from time import sleep
+from picamera import PiCamera
 
 
 def load_labels(path):
@@ -33,51 +36,85 @@ def classify_image(interpreter, image, labels, top_k=1):
   return (labels[label_id], prob)
 
 
-def read_image(width, height):
-    # read image
-    image_path='../image/dirty-4.jpg'
+def capture_image(width=224, height=224):
 
-    # process image to cv2pipfree
-    img = cv2.imread(image_path)
+  # capture image using PiCamera
+  with PiCamera() as camera:
 
-    # crop image to center
-    center = img.shape
-    x = center[1]/2 - width/2
-    y = center[0]/2 - height/2
-    img = img[int(y):int(y + height), int(x):int(x + width)]
+    camera.resolution = (500, 500)
+    camera.brightness = 50
+    camera.start_preview()
+    sleep(2)
+    camera.capture('images/test.jpg')
 
-    # convert BGR image to RGB
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+  # read image
+  image_path = 'images/test.jpg'
 
-    # resize and interpolate
-    img = cv2.resize(img, (224, 224), interpolation=cv2.INTER_AREA)
+  # process image to cv2pipfree
+  img = cv2.imread(image_path)
 
-    # show image
-    # cv2.imshow('Image', crop_img)
+  # crop image to center
+  center = img.shape
+  x = center[1]/2 - width/2
+  y = center[0]/2 - height/2
+  img = img[int(y):int(y + height), int(x):int(x + width)]
 
-    # add wait key. window waits until user presses a key
-    # cv2.waitKey(0)
+  # convert BGR image to RGB
+  # important to get accurate results
+  img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-    # and finally destroy/close all open windows
-    # cv2.destroyAllWindows()
+  # resize and interpolate
+  img = cv2.resize(img, (224, 224), interpolation=cv2.INTER_AREA)
 
-    return img
+  # show image
+  # cv2.imshow('Image', crop_img)
+
+  # add wait key. window waits until user presses a key
+  # cv2.waitKey(0)
+
+  # and finally destroy/close all open windows
+  # cv2.destroyAllWindows()
+
+  return img
+
+
+def check_turbidity(tries=5, delay=5):
+
+  labels = load_labels("../model/labels.txt")
+  interpreter = tf.lite.Interpreter("../model/model_quantized.tflite")
+  interpreter.allocate_tensors()
+  _, height, width, _ = interpreter.get_input_details()[0]['shape']
+
+  
+  while True:
+    result = []
+    temp = []
+    
+    for i in range(tries):
+      
+      print(f'checking {i}')
+      img = capture_image()
+      res, prob = classify_image(img)
+      temp.append((res, prob))
+      sleep(delay)
+    
+    result = np.unique(list(map(lambda x: x[0], temp))).tolist()
+  
+    if len(result) == 1:
+      print(temp)
+      return result[0]
+    else:
+      print(temp)
+      print('inconsistent result, checking again.')
 
 
 def main():
-    labels = load_labels("../model/labels.txt")
-    interpreter = Interpreter("../model/model_quantized.tflite")
-    interpreter.allocate_tensors()
-    _, height, width, _ = interpreter.get_input_details()[0]['shape']
 
-    image = read_image(width, height)
-    res, acc = classify_image(interpreter, image, labels)
+  check_turbidity()
 
-    print(res, acc)
-
-    cv2.imshow('image', image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+  # cv2.imshow('image', image)
+  # cv2.waitKey(0)
+  # cv2.destroyAllWindows()
 
 
 
