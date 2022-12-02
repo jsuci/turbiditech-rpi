@@ -1,89 +1,118 @@
-import cv2
 import numpy as np
 import tensorflow as tf
+from PIL import Image
 
 
+# obtaining data
+def capture_image():
+  pass
+
+def read_image(w, h):
+  image_path='../images/sample/dirty-1.png'
+  img = Image.open(image_path).convert('RGB')
+
+
+  # crop image to center
+  frac = 0.70
+  left = img.size[0] * ((1-frac)/2)
+  upper = img.size[1] * ((1-frac)/2)
+  right = img.size[0] - ((1-frac)/2) * img.size[0]
+  bottom = img.size[1] - ((1-frac)/2) * img.size[1]
+
+  img = img.crop((left, upper, right, bottom))
+  img = img.resize((224, 224))
+
+  return img
+
+
+# process data
 def load_labels(path):
   with open(path, 'r') as f:
-    return {i: line.strip() for i, line in enumerate(f.readlines())}
+    return [line.strip() for i, line in enumerate(f.readlines())]
 
 
 def set_input_tensor(interpreter, image):
+  # locate the first tensor index from input details
   tensor_index = interpreter.get_input_details()[0]['index']
+  
+  # return input tensor base on its index
   input_tensor = interpreter.tensor(tensor_index)()[0]
+  
+  # assing image data to input tensor
   input_tensor[:, :] = image
 
 
-def classify_image(interpreter, image, labels, top_k=1):
+def unset_input_tensor(interpreter):
+  tensor_index = interpreter.get_input_details()[0]['index']
+  input_tensor = interpreter.tensor(tensor_index)()[0]
+  
+  # reset input tensors to prevent using same image
+  input_tensor[:, :] = np.zeros(shape=(224, 224, 3))
 
-  set_input_tensor(interpreter, image)
+
+def classify_image(interpreter, image):
+  
+  # models makes a prediction and store to output tensor
   interpreter.invoke()
+  
   output_details = interpreter.get_output_details()[0]
-  output = np.squeeze(interpreter.get_tensor(output_details['index']))
+  
+  # predicted class label score
+  scores = interpreter.get_tensor(output_details['index'])[0]
+  
+  # dequantized the scores
+  scale, zero_point = output_details['quantization']
+  scores_dequantized = scale * (scores - zero_point)
+  
+  #predicted class label probability
+  dequantized_max_score = np.max(np.unique(scores_dequantized))
+  
+  # predicted class label id
+  max_score_index = np.where(scores_dequantized == np.max(np.unique(scores_dequantized)))[0][0]
+  
+  return max_score_index, dequantized_max_score
+    
 
-  # If the model is quantized (uint8 data), then dequantize the results
-  if output_details['dtype'] == np.uint8:
-    scale, zero_point = output_details['quantization']
-    output = scale * (output - zero_point)
+def get_status(retry=3, delay=5):
+  label_path = '../model/labels.txt'
+  model_path = '../model/model.tflite'
 
-  ordered = np.argpartition(-output, top_k)
-  results = [(i, output[i]) for i in ordered[:top_k]]
-  label_id, prob = results[0]
+  # set labels
+  labels = load_labels(label_path)
 
-  return (labels[label_id], prob)
+  # alternative : from tflite_runtime.interpreter import Interpreter
+  interpreter = tf.lite.Interpreter(model_path)
+  print('model loaded successfully')
 
+  # allocate to memory
+  interpreter.allocate_tensors()
 
-def read_image(width, height):
-    # read image
-    image_path='../image/clean-5.jpg'
+  # get input details
+  _, height, width, _ = interpreter.get_input_details()[0]['shape']
 
-    # process image to cv2pipfree
-    img = cv2.imread(image_path)
+  # np array image
+  image = read_image(width, height)
 
-    # crop image to center
-    center = img.shape
-    x = center[1]/2 - width/2
-    y = center[0]/2 - height/2
-    img = img[int(y):int(y + height), int(x):int(x + width)]
+  # initialize data to feed to model
+  set_input_tensor(interpreter, image)
 
-    # convert BGR image to RGB
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+  # make predictions
+  label_id, prob = classify_image(interpreter, image)
 
-    # resize and interpolate
-    img = cv2.resize(img, (224, 224), interpolation=cv2.INTER_AREA)
+  # getting results
+  class_label = labels[label_id]
+  accuracy = np.round(prob * 100, 2)
 
-    # show image
-    # cv2.imshow('Image', crop_img)
+  print(f'image label: {class_label}\naccuracy: {accuracy}')
 
-    # add wait key. window waits until user presses a key
-    # cv2.waitKey(0)
+  # reset input tensor
+  unset_input_tensor(interpreter)
 
-    # and finally destroy/close all open windows
-    # cv2.destroyAllWindows()
-
-    return img
 
 
 def main():
-    labels = load_labels("../model/labels.txt")
-    interpreter = tf.lite.Interpreter("../model/model_quantized.tflite")
-    interpreter.allocate_tensors()
-    _, height, width, _ = interpreter.get_input_details()[0]['shape']
-
-    image = read_image(width, height)
-    res, acc = classify_image(interpreter, image, labels)
-
-    print(res, acc)
-
-    cv2.imshow('image', image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-
-
-
-
+  get_status()
 
 
 if __name__ == "__main__":
-    main()
+  main()
