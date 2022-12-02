@@ -38,17 +38,17 @@ def classify_image(interpreter, image, labels, top_k=1):
 
 def capture_image(width=224, height=224):
 
-#   # capture image using PiCamera
-#   with PiCamera() as camera:
-# 
-#     camera.resolution = (500, 500)
-#     camera.framerate = 24
-#     camera.start_preview()
-#     camera.awb_mode = 'fluorescent'
-#     # camera.contrast = 50
-#     # camera.brightness = 50
-#     sleep(2)
-#     camera.capture('../images/test.jpg')
+  # capture image using PiCamera
+  with PiCamera() as camera:
+
+    camera.resolution = (500, 500)
+    camera.framerate = 24
+    camera.start_preview()
+    camera.awb_mode = 'fluorescent'
+    # camera.contrast = 50
+    # camera.brightness = 50
+    sleep(2)
+    camera.capture('../images/test.jpg')
 
   # read image
   image_path = '../images/test.jpg'
@@ -64,10 +64,10 @@ def capture_image(width=224, height=224):
 
   # convert BGR image to RGB
   # important to get accurate results
-  # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+  img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
   # resize and interpolate
-  # img = cv2.resize(img, (224, 224), interpolation=cv2.INTER_AREA)
+  img = cv2.resize(img, (224, 224), interpolation=cv2.INTER_AREA)
 
   # show image
   cv2.imshow('Image', img)
