@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
-# from tflite_runtime.interpreter import Interpreter
-import tensorflow as tf
+from tflite_runtime.interpreter import Interpreter
+# import tensorflow as tf
 from time import sleep
 from picamera import PiCamera
 
@@ -38,17 +38,20 @@ def classify_image(interpreter, image, labels, top_k=1):
 
 def capture_image(width=224, height=224):
 
-  # capture image using PiCamera
-  with PiCamera() as camera:
-
-    camera.resolution = (500, 500)
-    camera.brightness = 50
-    camera.start_preview()
-    sleep(2)
-    camera.capture('images/test.jpg')
+#   # capture image using PiCamera
+#   with PiCamera() as camera:
+# 
+#     camera.resolution = (500, 500)
+#     camera.framerate = 24
+#     camera.start_preview()
+#     camera.awb_mode = 'fluorescent'
+#     # camera.contrast = 50
+#     # camera.brightness = 50
+#     sleep(2)
+#     camera.capture('../images/test.jpg')
 
   # read image
-  image_path = 'images/test.jpg'
+  image_path = '../images/test.jpg'
 
   # process image to cv2pipfree
   img = cv2.imread(image_path)
@@ -61,19 +64,19 @@ def capture_image(width=224, height=224):
 
   # convert BGR image to RGB
   # important to get accurate results
-  img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+  # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
   # resize and interpolate
-  img = cv2.resize(img, (224, 224), interpolation=cv2.INTER_AREA)
+  # img = cv2.resize(img, (224, 224), interpolation=cv2.INTER_AREA)
 
   # show image
-  # cv2.imshow('Image', crop_img)
+  cv2.imshow('Image', img)
 
   # add wait key. window waits until user presses a key
-  # cv2.waitKey(0)
+  cv2.waitKey(0)
 
   # and finally destroy/close all open windows
-  # cv2.destroyAllWindows()
+  cv2.destroyAllWindows()
 
   return img
 
@@ -81,7 +84,7 @@ def capture_image(width=224, height=224):
 def check_turbidity(tries=5, delay=5):
 
   labels = load_labels("../model/labels.txt")
-  interpreter = tf.lite.Interpreter("../model/model_quantized.tflite")
+  interpreter = Interpreter("../model/model_quantized.tflite")
   interpreter.allocate_tensors()
   _, height, width, _ = interpreter.get_input_details()[0]['shape']
 
@@ -93,8 +96,8 @@ def check_turbidity(tries=5, delay=5):
     for i in range(tries):
       
       print(f'checking {i}')
-      img = capture_image()
-      res, prob = classify_image(img)
+      img = capture_image(width, height)
+      res, prob = classify_image(interpreter, img, labels)
       temp.append((res, prob))
       sleep(delay)
     
@@ -109,8 +112,8 @@ def check_turbidity(tries=5, delay=5):
 
 
 def main():
-
-  check_turbidity()
+    
+  print(check_turbidity(tries=2))
 
   # cv2.imshow('image', image)
   # cv2.waitKey(0)
