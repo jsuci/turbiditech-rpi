@@ -10,30 +10,12 @@ from io import BytesIO
 
 # obtaining data
 def capture_image():
-    # capture image using PiCamera
-    with PiCamera() as camera:
-#         camera.resolution = (500, 500)
-#         camera.start_preview()
-#         sleep(2)
-#         camera.capture('../images/test.png')
-        
-        camera.resolution = (500, 500)
-        sleep(3)
-#         camera.shutter_speed = camera.exposure_speed
-#         camera.exposure_mode = 'off'
-#         g = camera.awb_gains
-#         camera.awb_mode = 'off'
-#         camera.awb_gains = g
-        camera.capture('../images/test.jpg')
-        
-        # "Rewind" the stream to the beginning so we can read its content
-#         stream.seek(0)
-#         img = Image.open(stream).convert('RGB')
-#         img = img.resize((224, 224))
-#         
-#         img.show()
-#         
-#         return img
+  # capture image using PiCamera
+  with PiCamera() as camera:
+    camera.resolution = (500, 500)
+    sleep(2)
+    camera.capture('../images/test.jpg')
+
 
 def read_image(w, h):
   image_path='../images/test.jpg'
@@ -51,7 +33,7 @@ def read_image(w, h):
   img = img.resize((224, 224))
   
   # show image
-  img.show()
+  # img.show()
 
   return img
 
@@ -122,27 +104,47 @@ def get_status(retry=3, delay=5):
   _, height, width, _ = interpreter.get_input_details()[0]['shape']
   
   # start loop
+  while True:
+    result = []
+    temp = []
+    
+    for i in range(retry):
+      
+      print(f'checking {i}')
+
+      # capture image using PiCamera
+      capture_image()
+
+      # read and resize to np array image
+      image = read_image(width, height)
+
+      # initialize data to feed to model
+      set_input_tensor(interpreter, image)
+
+      # make predictions
+      label_id, prob = classify_image(interpreter, image)
+
+      # getting results
+      class_label = labels[label_id].split()[-1]
+      accuracy = np.round(prob * 100, 2)
+
+      # collect resutls
+      temp.append((class_label, accuracy))
+
+      # reset input tensor
+      unset_input_tensor(interpreter)
+
+      sleep(delay)
+    
+    # check for consitent results
+    result = np.unique(list(map(lambda x: x[0], temp))).tolist()
   
-  # capture image using PiCamera
-  capture_image()
-
-  # read and resize to np array image
-  image = read_image(width, height)
-
-  # initialize data to feed to model
-  set_input_tensor(interpreter, image)
-
-  # make predictions
-  label_id, prob = classify_image(interpreter, image)
-
-  # getting results
-  class_label = labels[label_id]
-  accuracy = np.round(prob * 100, 2)
-
-  print(f'image label: {class_label}\naccuracy: {accuracy}')
-
-  # reset input tensor
-  unset_input_tensor(interpreter)
+    if len(result) == 1:
+      avg_accu = np.round(np.mean(list(map(lambda x: x[-1], temp))), 2)
+      return result[0], avg_accu
+    else:
+      print(temp)
+      print('invalid results, check again.')
 
 
 

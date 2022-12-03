@@ -1,26 +1,38 @@
 import numpy as np
 import tensorflow as tf
+from fractions import Fraction
+from time import sleep
 from PIL import Image
+from io import BytesIO
+
 
 
 # obtaining data
 def capture_image():
-  pass
+  # capture image using PiCamera
+  with PiCamera() as camera:
+    camera.resolution = (500, 500)
+    sleep(2)
+    camera.capture('../images/test.jpg')
+
 
 def read_image(w, h):
-  image_path='../images/sample/dirty-1.png'
+  image_path='../images/sample/test-2.jpg'
   img = Image.open(image_path).convert('RGB')
 
 
   # crop image to center
-  frac = 0.70
-  left = img.size[0] * ((1-frac)/2)
-  upper = img.size[1] * ((1-frac)/2)
-  right = img.size[0] - ((1-frac)/2) * img.size[0]
-  bottom = img.size[1] - ((1-frac)/2) * img.size[1]
+#   frac = 0.70
+#   left = img.size[0] * ((1-frac)/2)
+#   upper = img.size[1] * ((1-frac)/2)
+#   right = img.size[0] - ((1-frac)/2) * img.size[0]
+#   bottom = img.size[1] - ((1-frac)/2) * img.size[1]
+#   img = img.crop((left, upper, right, bottom))
 
-  img = img.crop((left, upper, right, bottom))
   img = img.resize((224, 224))
+  
+  # show image
+  img.show()
 
   return img
 
@@ -89,30 +101,57 @@ def get_status(retry=3, delay=5):
 
   # get input details
   _, height, width, _ = interpreter.get_input_details()[0]['shape']
+  
+  # start loop
+  while True:
+    result = []
+    temp = []
+    avg_accu = 0
+    
+    for i in range(retry):
+      
+      print(f'checking {i}')
 
-  # np array image
-  image = read_image(width, height)
+      # capture image using PiCamera
+      # capture_image()
 
-  # initialize data to feed to model
-  set_input_tensor(interpreter, image)
+      # read and resize to np array image
+      image = read_image(width, height)
 
-  # make predictions
-  label_id, prob = classify_image(interpreter, image)
+      # initialize data to feed to model
+      set_input_tensor(interpreter, image)
 
-  # getting results
-  class_label = labels[label_id]
-  accuracy = np.round(prob * 100, 2)
+      # make predictions
+      label_id, prob = classify_image(interpreter, image)
 
-  print(f'image label: {class_label}\naccuracy: {accuracy}')
+      # getting results
+      class_label = labels[label_id].split()[-1]
+      accuracy = np.round(prob * 100, 2)
 
-  # reset input tensor
-  unset_input_tensor(interpreter)
+      # collect resutls
+      temp.append((class_label, accuracy))
 
+      # reset input tensor
+      unset_input_tensor(interpreter)
+
+      sleep(delay)
+    
+    # check for consitent results
+    result = np.unique(list(map(lambda x: x[0], temp))).tolist()
+  
+    if len(result) == 1:
+      avg_accu = np.round(np.mean(list(map(lambda x: x[-1], temp))), 2)
+      return result[0], avg_accu
+    else:
+      print(temp)
+      print('invalid results, check again.')
 
 
 def main():
-  get_status()
+  res, prob = get_status()
+  print(res, prob)
 
 
 if __name__ == "__main__":
   main()
+
