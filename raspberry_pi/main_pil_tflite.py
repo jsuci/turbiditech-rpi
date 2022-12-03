@@ -10,11 +10,26 @@ from io import BytesIO
 
 # obtaining data
 def capture_image():
+  
   # capture image using PiCamera
   with PiCamera() as camera:
-    camera.resolution = (500, 500)
-    sleep(2)
-    camera.capture('../images/test.jpg')
+    
+    camera.resolution = (300, 300)
+    camera.zoom = (0.3, 0.3, 1.0, 1.0)
+
+    # warm up camera
+    sleep(3)
+    
+    # adjusting the blue tint on low light env
+    # camera.awb_mode = 'auto'
+    camera.drc_strength = 'high'
+    camera.image_effect = 'denoise'
+    
+        
+    # preview and capture image
+    # camera.start_preview()
+    sleep(3)
+    camera.capture('../images/test.jpg', quality=100)
 
 
 def read_image(w, h):
@@ -23,12 +38,12 @@ def read_image(w, h):
 
 
   # crop image to center
-#   frac = 0.70
-#   left = img.size[0] * ((1-frac)/2)
-#   upper = img.size[1] * ((1-frac)/2)
-#   right = img.size[0] - ((1-frac)/2) * img.size[0]
-#   bottom = img.size[1] - ((1-frac)/2) * img.size[1]
-#   img = img.crop((left, upper, right, bottom))
+  # frac = 0.70
+  # left = img.size[0] * ((1-frac)/2)
+  # upper = img.size[1] * ((1-frac)/2)
+  # right = img.size[0] - ((1-frac)/2) * img.size[0]
+  # bottom = img.size[1] - ((1-frac)/2) * img.size[1]
+  # img = img.crop((left, upper, right, bottom))
 
   img = img.resize((224, 224))
   
@@ -149,7 +164,8 @@ def get_status(retry=3, delay=5):
 
 
 def main():
-  get_status()
+  res, prob = get_status(retry=2)
+  print(res, prob)
 
 
 if __name__ == "__main__":
