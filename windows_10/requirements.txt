@@ -2,3 +2,5 @@ pillow
 numpy
 tensorflow
 opencv-python
+gpiozero
+python-dotenv

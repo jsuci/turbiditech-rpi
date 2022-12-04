@@ -4,3 +4,5 @@ tensorflow
 opencv-python
 tflite-runtime
 picamera
+gpiozero
+python-dotenv

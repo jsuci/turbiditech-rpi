@@ -1,10 +1,8 @@
 import numpy as np
 from tflite_runtime.interpreter import Interpreter
 from picamera import PiCamera
-from fractions import Fraction
 from time import sleep
 from PIL import Image
-from io import BytesIO
 
 
 
@@ -101,7 +99,7 @@ def classify_image(interpreter, image):
   return max_score_index, dequantized_max_score
     
 
-def get_status(retry=3, delay=5):
+def check_water(retry=3, delay=5):
   label_path = '../model/labels.txt'
   model_path = '../model/model.tflite'
 
@@ -164,7 +162,7 @@ def get_status(retry=3, delay=5):
 
 
 def main():
-  res, prob = get_status(retry=2)
+  res, prob = check_water(retry=2)
   print(res, prob)
 
 

@@ -1,38 +1,74 @@
+# rpi
 import numpy as np
 import tensorflow as tf
-from fractions import Fraction
 from time import sleep
 from PIL import Image
-from io import BytesIO
+# from tflite_runtime.interpreter import Interpreter
+# from picamera import PiCamera
+# from gpiozero import LED
 
+# api
+import requests
+import os
+import http.client
+import mimetypes
+import urllib.parse
+import binascii
+from codecs import encode
+from base64 import b64encode
+from dotenv import load_dotenv
+
+
+
+# constants
+load_dotenv()
+DEVICE_ID = os.getenv('DEVICE_ID')
+DEVICE_NAME = os.getenv('DEVICE_NAME')
+EMAIL = os.getenv('EMAIL')
+PASSWORD = os.getenv('PASSWORD')
 
 
 # obtaining data
 def capture_image():
+  
   # capture image using PiCamera
   with PiCamera() as camera:
-    camera.resolution = (500, 500)
-    sleep(2)
-    camera.capture('../images/test.jpg')
+    
+    camera.resolution = (300, 300)
+    camera.zoom = (0.3, 0.3, 1.0, 1.0)
+
+    # warm up camera
+    sleep(3)
+    
+    # adjusting the blue tint on low light env
+    # camera.awb_mode = 'auto'
+    camera.drc_strength = 'high'
+    camera.image_effect = 'denoise'
+    
+        
+    # preview and capture image
+    # camera.start_preview()
+    sleep(3)
+    camera.capture('../images/test.jpg', quality=100)
 
 
 def read_image(w, h):
-  image_path='../images/sample/test-2.jpg'
+  image_path='../images/test.jpg'
   img = Image.open(image_path).convert('RGB')
 
 
   # crop image to center
-#   frac = 0.70
-#   left = img.size[0] * ((1-frac)/2)
-#   upper = img.size[1] * ((1-frac)/2)
-#   right = img.size[0] - ((1-frac)/2) * img.size[0]
-#   bottom = img.size[1] - ((1-frac)/2) * img.size[1]
-#   img = img.crop((left, upper, right, bottom))
+  # frac = 0.70
+  # left = img.size[0] * ((1-frac)/2)
+  # upper = img.size[1] * ((1-frac)/2)
+  # right = img.size[0] - ((1-frac)/2) * img.size[0]
+  # bottom = img.size[1] - ((1-frac)/2) * img.size[1]
+  # img = img.crop((left, upper, right, bottom))
 
   img = img.resize((224, 224))
   
   # show image
-  img.show()
+  # img.show()
 
   return img
 
@@ -85,7 +121,7 @@ def classify_image(interpreter, image):
   return max_score_index, dequantized_max_score
     
 
-def get_status(retry=3, delay=5):
+def check_water(retry=3, delay=5):
   label_path = '../model/labels.txt'
   model_path = '../model/model.tflite'
 
@@ -106,7 +142,6 @@ def get_status(retry=3, delay=5):
   while True:
     result = []
     temp = []
-    avg_accu = 0
     
     for i in range(retry):
       
@@ -147,9 +182,118 @@ def get_status(retry=3, delay=5):
       print('invalid results, check again.')
 
 
+# send / receive data from API
+def get_valve_status():
+  url = f'https://turbiditech.fly.dev/api/device-records/{DEVICE_ID}'
+  r = requests.get(url, auth=(EMAIL, PASSWORD))
+
+  if r.status_code == 200:
+    data = r.json()[-1]
+    v_stat = data['valve_status']
+    return v_stat
+  else:
+    return False
+  
+
+def post_water_valve_status(w_stat, v_stat, prob):
+
+  url = urllib.parse.urlsplit(f'https://turbiditech.fly.dev/api/device-records/{DEVICE_ID}')
+  image_path = '../images/test.jpg'
+
+  details = f'{DEVICE_NAME.upper()} has detected {prob}% {w_stat.upper()} water status. Turning {v_stat.upper()} valve.'
+
+  conn = http.client.HTTPSConnection(url.hostname)
+  dataList = []
+  boundary = boundary = binascii.hexlify(os.urandom(16)).decode('ascii')
+
+  dataList.append(encode('--' + boundary))
+  dataList.append(encode('Content-Disposition: form-data; name=valve_status;'))
+  dataList.append(encode('Content-Type: {}'.format('text/plain')))
+  dataList.append(encode(''))
+  dataList.append(encode(f'{v_stat}'))
+
+  dataList.append(encode('--' + boundary))
+  dataList.append(encode('Content-Disposition: form-data; name=water_status;'))
+  dataList.append(encode('Content-Type: {}'.format('text/plain')))
+  dataList.append(encode(''))
+  dataList.append(encode(f'{w_stat}'))
+
+  dataList.append(encode('--' + boundary))
+  dataList.append(encode('Content-Disposition: form-data; name=record_device;'))
+  dataList.append(encode('Content-Type: {}'.format('text/plain')))
+  dataList.append(encode(''))
+  dataList.append(encode(f'{DEVICE_ID}'))
+
+  dataList.append(encode('--' + boundary))
+  dataList.append(encode('Content-Disposition: form-data; name=details;'))
+  dataList.append(encode('Content-Type: {}'.format('text/plain')))
+  dataList.append(encode(''))
+  dataList.append(encode(f'{details}'))
+
+  dataList.append(encode('--' + boundary))
+  dataList.append(encode('Content-Disposition: form-data; name=record_image; filename={0}'.format(image_path)))
+  fileType = mimetypes.guess_type(image_path)[0] or 'application/octet-stream'
+  dataList.append(encode('Content-Type: {}'.format(fileType)))
+  dataList.append(encode(''))
+
+  with open(image_path, 'rb') as f:
+      dataList.append(f.read())
+      dataList.append(encode('--'+boundary+'--'))
+      dataList.append(encode(''))
+
+  body = b'\r\n'.join(dataList)
+  payload = body
+  headers = {
+    'Authorization': f'Basic {b64encode(bytes(f"{EMAIL}:{PASSWORD}", "utf-8")).decode("ISO-8859-1")}',
+    'Content-type': f'multipart/form-data; boundary={boundary}'
+  }
+  conn.request("POST", "/api/device-records/2", payload, headers)
+  res = conn.getresponse()
+
+  # data = res.read()
+
+  print(res.status, res.reason)
+  
+  if res.status == 200:
+    print('success sending data.')
+  else:
+    print('error sending data.')
+
+
 def main():
-  res, prob = get_status()
-  print(res, prob)
+  # valve = LED(18)
+
+  # while True:
+  server_v_stat = get_valve_status()
+
+  if server_v_stat == 'on':
+    print('valve.on()')
+  elif server_v_stat == 'off':
+    print('valve.off()')
+  else:
+    print('error fetching valve status')
+
+  res, prob = check_water(retry=2)
+
+  if res == 'dirty':
+    print('valve.off()')
+
+    w_stat = res
+    v_stat = 'off'
+
+  else:
+    print('valve.on()')
+
+    w_stat = res
+    v_stat = 'on'
+  
+  print('sending data to API.')
+  post_water_valve_status(w_stat, v_stat, prob)
+
+  sleep(10)
+
+
+
 
 
 if __name__ == "__main__":
