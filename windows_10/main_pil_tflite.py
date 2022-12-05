@@ -130,7 +130,7 @@ def check_water(retry=3, delay=5):
 
   # alternative : from tflite_runtime.interpreter import Interpreter
   interpreter = tf.lite.Interpreter(model_path)
-  print('model loaded successfully')
+  # print('model loaded successfully')
 
   # allocate to memory
   interpreter.allocate_tensors()
@@ -144,8 +144,6 @@ def check_water(retry=3, delay=5):
     temp = []
     
     for i in range(retry):
-      
-      print(f'checking {i}')
 
       # capture image using PiCamera
       # capture_image()
@@ -183,17 +181,27 @@ def check_water(retry=3, delay=5):
 
 
 # send / receive data from API
-def get_valve_status():
+def get_server_status():
   url = f'https://turbiditech.fly.dev/api/device-records/{DEVICE_ID}'
   r = requests.get(url, auth=(EMAIL, PASSWORD))
 
   if r.status_code == 200:
     data = r.json()[-1]
     v_stat = data['valve_status']
-    return v_stat
+    w_stat = data['water_status']
+
+    return v_stat, w_stat
   else:
-    return False
-  
+    return r.status_code
+
+
+def get_device_water_status():
+  # device water status
+  res, prob = check_water(retry=2)
+  w_stat = res
+
+  return w_stat, prob
+
 
 def post_water_valve_status(w_stat, v_stat, prob):
 
@@ -261,36 +269,49 @@ def post_water_valve_status(w_stat, v_stat, prob):
 
 
 def main():
-  # valve = LED(18)
+  # assign pin for solenoid valve
+  led = {'value': 1}
 
-  # while True:
-  server_v_stat = get_valve_status()
+  while True:
+    # check server for changes in the valve status
+    print('getting server valve status.')
+    server_v_stat, server_w_status = get_server_status()
+    
 
-  if server_v_stat == 'on':
-    print('valve.on()')
-  elif server_v_stat == 'off':
-    print('valve.off()')
-  else:
-    print('error fetching valve status')
+    # the valve is normally turned ON
+    # if valve was turned off turn off valve
+    # and do not perform check_status()
+    # wait for the server to turn it back on
 
-  res, prob = check_water(retry=2)
+    print(f'The server has manually turned {server_v_stat} the valve.')
+    
+    if server_v_stat == 'off':
+      print('turning vavle off using led.off() command.')
 
-  if res == 'dirty':
-    print('valve.off()')
+    # if the valve has been turned on
+    # then turn on valve base on check water status results
+    if server_v_stat == 'on':
+      print('checking water status first before turning ON the valve.\n\n')
+      device_w_stat, prob = get_device_water_status()
 
-    w_stat = res
-    v_stat = 'off'
+      if (server_w_status == 'clean') and (device_w_stat == 'clean'):
+        print('\n\nthere are no changes in water turbidity. everything is clean')
+      else:
+        print(f'\n\ndevice has detected {prob}% {device_w_stat} water status')
 
-  else:
-    print('valve.on()')
+        if device_w_stat == 'clean':
+          print('turning vavle on using led.on() command.')
+          v_stat = 'on'
+        else:
+          print('turning vavle off using led.off() command.')
+          v_stat = 'off'
 
-    w_stat = res
-    v_stat = 'on'
-  
-  print('sending data to API.')
-  post_water_valve_status(w_stat, v_stat, prob)
+        print('sending results to server')
+        post_water_valve_status(w_stat=device_w_stat, v_stat=v_stat, prob=prob)
+        
 
-  sleep(10)
+    print('pause operation for 10 sseconds.\n\n')
+    sleep(10)
 
 
 
