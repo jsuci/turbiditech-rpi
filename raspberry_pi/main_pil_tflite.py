@@ -1,9 +1,31 @@
+# rpi
 import numpy as np
-from tflite_runtime.interpreter import Interpreter
-from picamera import PiCamera
+# import tensorflow as tf
 from time import sleep
 from PIL import Image
+from tflite_runtime.interpreter import Interpreter
+from picamera import PiCamera
+from gpiozero import LED
 
+# api
+import requests
+import os
+import http.client
+import mimetypes
+import urllib.parse
+import binascii
+from codecs import encode
+from base64 import b64encode
+from dotenv import load_dotenv
+
+
+
+# constants
+load_dotenv()
+DEVICE_ID = os.getenv('DEVICE_ID')
+DEVICE_NAME = os.getenv('DEVICE_NAME')
+EMAIL = os.getenv('EMAIL')
+PASSWORD = os.getenv('PASSWORD')
 
 
 # obtaining data
@@ -107,8 +129,10 @@ def check_water(retry=3, delay=5):
   labels = load_labels(label_path)
 
   # alternative : from tflite_runtime.interpreter import Interpreter
+  # interpreter = tf.lite.Interpreter(model_path)
   interpreter = Interpreter(model_path)
-  print('model loaded successfully')
+
+  # print('model loaded successfully')
 
   # allocate to memory
   interpreter.allocate_tensors()
@@ -122,11 +146,9 @@ def check_water(retry=3, delay=5):
     temp = []
     
     for i in range(retry):
-      
-      print(f'checking {i}')
 
       # capture image using PiCamera
-      capture_image()
+      # capture_image()
 
       # read and resize to np array image
       image = read_image(width, height)
@@ -160,10 +182,142 @@ def check_water(retry=3, delay=5):
       print('invalid results, check again.')
 
 
+# send / receive data from API
+def get_server_status():
+  url = f'https://turbiditech.fly.dev/api/device-records/{DEVICE_ID}'
+  r = requests.get(url, auth=(EMAIL, PASSWORD))
+
+  if r.status_code == 200:
+    data = r.json()[-1]
+    v_stat = data['valve_status']
+    w_stat = data['water_status']
+
+    return v_stat, w_stat
+  else:
+    return r.status_code
+
+
+def get_device_water_status():
+  # device water status
+  res, prob = check_water(retry=2)
+  w_stat = res
+
+  return w_stat, prob
+
+
+def post_water_valve_status(w_stat, v_stat, prob):
+
+  url = urllib.parse.urlsplit(f'https://turbiditech.fly.dev/api/device-records/{DEVICE_ID}')
+  image_path = '../images/test.jpg'
+
+  details = f'{DEVICE_NAME.upper()} has detected {prob}% {w_stat.upper()} water status. Turning {v_stat.upper()} valve.'
+
+  conn = http.client.HTTPSConnection(url.hostname)
+  dataList = []
+  boundary = boundary = binascii.hexlify(os.urandom(16)).decode('ascii')
+
+  dataList.append(encode('--' + boundary))
+  dataList.append(encode('Content-Disposition: form-data; name=valve_status;'))
+  dataList.append(encode('Content-Type: {}'.format('text/plain')))
+  dataList.append(encode(''))
+  dataList.append(encode(f'{v_stat}'))
+
+  dataList.append(encode('--' + boundary))
+  dataList.append(encode('Content-Disposition: form-data; name=water_status;'))
+  dataList.append(encode('Content-Type: {}'.format('text/plain')))
+  dataList.append(encode(''))
+  dataList.append(encode(f'{w_stat}'))
+
+  dataList.append(encode('--' + boundary))
+  dataList.append(encode('Content-Disposition: form-data; name=record_device;'))
+  dataList.append(encode('Content-Type: {}'.format('text/plain')))
+  dataList.append(encode(''))
+  dataList.append(encode(f'{DEVICE_ID}'))
+
+  dataList.append(encode('--' + boundary))
+  dataList.append(encode('Content-Disposition: form-data; name=details;'))
+  dataList.append(encode('Content-Type: {}'.format('text/plain')))
+  dataList.append(encode(''))
+  dataList.append(encode(f'{details}'))
+
+  dataList.append(encode('--' + boundary))
+  dataList.append(encode('Content-Disposition: form-data; name=record_image; filename={0}'.format(image_path)))
+  fileType = mimetypes.guess_type(image_path)[0] or 'application/octet-stream'
+  dataList.append(encode('Content-Type: {}'.format(fileType)))
+  dataList.append(encode(''))
+
+  with open(image_path, 'rb') as f:
+      dataList.append(f.read())
+      dataList.append(encode('--'+boundary+'--'))
+      dataList.append(encode(''))
+
+  body = b'\r\n'.join(dataList)
+  payload = body
+  headers = {
+    'Authorization': f'Basic {b64encode(bytes(f"{EMAIL}:{PASSWORD}", "utf-8")).decode("ISO-8859-1")}',
+    'Content-type': f'multipart/form-data; boundary={boundary}'
+  }
+  conn.request("POST", "/api/device-records/2", payload, headers)
+  res = conn.getresponse()
+
+  # data = res.read()
+
+  print(res.status, res.reason)
+  
+  if res.status == 200:
+    print('success sending data.')
+  else:
+    print('error sending data.')
+
 
 def main():
-  res, prob = check_water(retry=2)
-  print(res, prob)
+  # assign pin for solenoid valve
+  # led = LED(18)
+  led = {'value': 1}
+
+  while True:
+    # check server for changes in the valve status
+    print('getting server valve status.')
+    server_v_stat, server_w_status = get_server_status()
+    
+
+    # the valve is normally turned ON
+    # if valve was turned off turn off valve
+    # and do not perform check_status()
+    # wait for the server to turn it back on
+
+    print(f'The server has manually turned {server_v_stat} the valve.')
+    
+    if server_v_stat == 'off':
+      print('turning vavle off using led.off() command.')
+
+    # if the valve has been turned on
+    # then turn on valve base on check water status results
+    if server_v_stat == 'on':
+      print('checking water status first before turning ON the valve.\n\n')
+      device_w_stat, prob = get_device_water_status()
+
+      if (server_w_status == 'clean') and (device_w_stat == 'clean'):
+        print('\n\nthere are no changes in water turbidity. everything is clean')
+      else:
+        print(f'\n\ndevice has detected {prob}% {device_w_stat} water status')
+
+        if device_w_stat == 'clean':
+          print('turning vavle on using led.on() command.')
+          v_stat = 'on'
+        else:
+          print('turning vavle off using led.off() command.')
+          v_stat = 'off'
+
+        print('sending results to server')
+        post_water_valve_status(w_stat=device_w_stat, v_stat=v_stat, prob=prob)
+        
+
+    print('pause operation for 10 sseconds.\n\n')
+    sleep(10)
+
+
+
 
 
 if __name__ == "__main__":
