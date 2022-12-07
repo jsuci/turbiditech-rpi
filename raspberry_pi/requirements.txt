@@ -7,3 +7,4 @@ picamera
 gpiozero
 python-dotenv
 pyserial
+RPi.GPIO
