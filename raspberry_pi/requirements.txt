@@ -6,3 +6,4 @@ tflite-runtime
 picamera
 gpiozero
 python-dotenv
+pyserial
