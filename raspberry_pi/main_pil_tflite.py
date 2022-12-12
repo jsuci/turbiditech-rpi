@@ -19,7 +19,6 @@ from base64 import b64encode
 from dotenv import load_dotenv
 
 
-
 # constants
 load_dotenv()
 DEVICE_ID = os.getenv('DEVICE_ID')
@@ -272,12 +271,10 @@ def post_water_valve_status(w_stat, v_stat, prob):
 
 def main():
   # Create instance for the specified pin
-  # valve = DigitalOutputDevice(4)
+  valve = DigitalOutputDevice(18)
   # valve.on()
   # valve.off()
   # valve.value
-
-  valve = {'value': 1}
 
   while True:
     # check server for changes in the valve status
@@ -293,15 +290,14 @@ def main():
     print(f'valve status turned {server_v_stat.upper()}')
     
     # if both server and device valve is OFF
-    if (server_v_stat == 'off') and (valve['value'] == 0):
+    if (server_v_stat == 'off') and (valve.value == 0):
       print('both server and device valve status are turned OFF')
       
     # if server valve is OFF and device valve is ON
-    if (server_v_stat == 'off') and (valve['value'] == 1):
+    if (server_v_stat == 'off') and (valve.value == 1):
       print('user manually turned OFF the valve')
       print('turn valve OFF')
-      # valve.off()
-      valve['value'] = 0
+      valve.off()
 
     # if the valve has been turned on
     # then turn on valve base on check water status results
@@ -316,18 +312,18 @@ def main():
       else:
         if device_w_stat == 'clean':
           print('turn valve ON')
-          # valve.on()
+          valve.on()
           v_stat = 'on'
         else:
           print('turn vavle OFF')
-          # valve.off()
+          valve.off()
           v_stat = 'off'
 
         print('sending results to server')
         post_water_valve_status(w_stat=device_w_stat, v_stat=v_stat, prob=prob)
         
 
-    print('\nsleep 10 sseconds.\n\n')
+    print('\nsleep 10 seconds.\n\n')
     sleep(10)
 
 
