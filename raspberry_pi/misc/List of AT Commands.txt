@@ -1,0 +1,30 @@
+AT commands are a set of commands used to control and configure modems and other devices that support the AT command set. These commands are sent over a serial or other communication interface to the device, and the device responds with specific information or performs specific actions based on the command it receives.
+
+Here is a list of some common AT commands and their definitions:
+
+AT: This is a basic AT command used to check if the device is responding to AT commands. When this command is sent to the device, it should respond with an "OK" message.
+
+AT+CFUN: This command is used to control the device's functionality. It can be used to enable or disable specific features of the device, such as the radio, the SIM card, or the device's built-in applications.
+
+AT+CPIN: This command is used to check the status of the device's SIM card. It can be used to verify that the SIM card is inserted properly and that it has an active data plan.
+
+AT+CSQ: This command is used to check the signal strength of the device's radio. It returns a numeric value indicating the strength of the signal, as well as the quality of the signal.
+
+AT+COPS: This command is used to query the device's current network operator. It returns the name and other information about the network operator that the device is currently connected to.
+
+AT+CNUM: This command is used to query the device's own phone number. It returns the phone number stored on the SIM card in the device.
+
+AT+CREG: This command is used to check the device's network registration status. It returns information about whether the device is registered on a network and, if so, which network it is registered on.
+
+AT+CMGR: This command is used to read SMS messages stored on the device's SIM card. It can be used to retrieve specific SMS messages or to read all of the SMS messages stored on the SIM card.
+
+AT+CMGS: This command is used to send SMS messages from the device. It can be used to send SMS messages to other phones or to other devices that support SMS.
+
+AT+CMGD: This command is used to delete SMS messages stored on the device's SIM card. It can be used to delete specific SMS messages or to delete all of the SMS messages stored on the SIM card.
+
+This is just a small selection of the many AT commands that are available. Different devices may support different AT commands, and the exact syntax and usage of these commands may vary depending on the device. Consult the documentation or support resources for your specific device to learn more about the available AT commands and how to use them.
+
+give an example of how to use AT commands in python
+
+
+
