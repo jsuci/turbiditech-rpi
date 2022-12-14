@@ -272,9 +272,6 @@ def post_water_valve_status(w_stat, v_stat, prob):
 def main():
   # Create instance for the specified pin
   valve = DigitalOutputDevice(18)
-  # valve.on()
-  # valve.off()
-  # valve.value
 
   while True:
     # check server for changes in the valve status
