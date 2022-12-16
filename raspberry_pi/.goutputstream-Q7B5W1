@@ -1,0 +1,168 @@
+import serial
+from time import sleep
+
+
+
+def activate_gprs(ser):
+  # attach module to GPRS
+  ser.write(f'AT+CGATT=1\r\n'.encode())
+  sleep(2)
+  print(ser.readlines(), 'AT+CGATT=1')
+  
+  
+  # Set conn type
+  ser.write(f'AT+SAPBR=3,1,"Contype","GPRS"\r\n'.encode())
+  sleep(2)
+  print(ser.readlines(), 'AT+SAPBR=3,1,"Contype","GPRS"')
+  
+  
+  # Set the APN
+  ser.write(f'AT+SAPBR=3,1,"APN","http.globe.com.ph"\r\n'.encode())
+  sleep(2)
+  print(ser.readlines(), 'AT+SAPBR=3,1,"APN","http.globe.com.ph"')
+  
+  
+  # Activate PDP Packet
+  ser.write(f'AT+SAPBR=0,1\r\n'.encode())
+  sleep(2)
+  print(ser.readlines(), 'AT+SAPBR=0,1')
+  
+  ser.write(f'AT+SAPBR=1,1\r\n'.encode())
+  sleep(2)
+  print(ser.readlines(), 'AT+SAPBR=1,1')
+  
+  # Query IP address
+  ser.write(f'AT+SAPBR=2,1\r\n'.encode())
+  sleep(2)
+  print(ser.readlines(), 'AT+SAPBR=2,1')
+  
+  
+  # ----------- HTTP Connection ------ #
+
+  # Start HTTP service
+  ser.write(f'AT+HTTPINIT\r\n'.encode())
+  sleep(2)
+  print(ser.readlines(), 'AT+HTTPINIT')
+  
+  # Set URL parameters
+  ser.write(f'AT+HTTPPARA="URL","https://turbiditech.fly.dev/api/device-records/2"\r\n'.encode())
+  sleep(10)
+  print(ser.readlines(), 'AT+HTTPPARA="URL","https://turbiditech.fly...')
+  
+  # Send the request
+  ser.write(f'AT+HTTPACTION=0\r\n'.encode())
+  sleep(2)
+  print(ser.readlines(), 'AT+HTTPACTION=0')
+
+  
+  
+  
+  
+  
+  # ser.write(f'AT+CIPSHUT\r\n'.encode())
+  # sleep(2)
+  # print(ser.readlines(), 'AT+CIPSHUT')
+
+  # ser.write(f'AT+CIPMUX=0\r\n'.encode())
+  # sleep(2)
+  # print(ser.readlines(), 'AT+CIPMUX=0')
+  
+  # ser.write(f'AT+CDGCONT=1,"IP","http.globe.com.ph"\r\n'.encode())
+  # sleep(2)
+  # print(ser.readlines(), 'AT+CDGCONT=1,"IP","http.globe.com.ph"')
+  
+  # ser.write(f'AT+CSTT="http.globe.com.ph","",""\r\n'.encode())
+  # sleep(2)
+  # print(ser.readlines(), 'AT+CSTT="http.globe.com.ph","",""')
+
+  # # Context
+  # ser.write(f'AT+SAPBR=0,1\r\n'.encode())
+  # sleep(2)
+  # print(ser.readlines(), 'AT+SAPBR=0,1')
+  
+  # # Set to GPRS
+  # ser.write(f'AT+SAPBR=3,1,"Contype","GPRS"\r\n'.encode())
+  # sleep(2)
+  # print(ser.readlines(), 'AT+SAPBR=3,1,"Contype","GPRS"')
+  
+  # # APN
+  # ser.write(f'AT+SAPBR=3,1,"APN","http.globe.com.ph"\r\n'.encode())
+  # sleep(2)
+  # print(ser.readlines(), 'AT+SAPBR=3,1,"APN","http.globe.com.ph"')
+  
+  # # Context
+  # ser.write(f'AT+SAPBR=1,1\r\n'.encode())
+  # sleep(2)
+  # print(ser.readlines(), 'AT+SAPBR=1,1')
+  
+  
+  # # Attach GPRS Service
+  # ser.write(f'AT+CGATT=1\r\n'.encode())
+  # sleep(2)
+  # print(ser.readlines(), 'AT+CGATT=1')
+  
+  
+def http_get(ser):
+  
+  
+  # Start HTTP service
+  ser.write(f'AT+HTTPINIT\r\n'.encode())
+  sleep(2)
+  print(ser.readlines(), 'AT+HTTPINIT')
+
+  
+  # # Open bearer
+  # ser.write(f'AT+SAPBR=1,1\r\n'.encode())
+  # sleep(10)
+  # print(ser.readlines(), 'AT+SAPBR=1,1')
+  
+  
+  # Start HTTP service
+  # ser.write(f'AT+HTTPINIT\r\n'.encode())
+  # sleep(2)
+  # print(ser.readlines(), 'AT+HTTPINIT')
+  
+  
+  # HTTPS
+  # ser.write(f'AT+HTTPSSL=1\r\n'.encode())
+  # sleep(2)
+  # print(ser.readlines(), 'AT+HTTPSSL=1')
+
+  
+  # ser.write(f'AT+HTTPPARA="URL","https://turbiditech.fly.dev/api/device-records/2"\r\n'.encode())
+  # sleep(10)
+  # print(ser.readlines(), 'AT+HTTPPARA="URL","https://turbiditech.fly...')
+  
+  # # Start session
+  # ser.write(f'AT+HTTPACTION=0\r\n'.encode())
+  # sleep(2)
+  # print(ser.readlines(), 'AT+HTTPACTION=0')
+
+  
+  # # Get data
+  # ser.write(f'AT+HTTPREAD\r\n'.encode())
+  # sleep(20)
+  # print(ser.readlines(), 'AT+HTTPREAD')
+
+  
+  
+def main():
+  # Open a serial connection to a device with AT commands
+  ser = serial.Serial("/dev/ttyS0", baudrate=115200, timeout=1)
+  
+  # # activate gprs
+  # activate_gprs(ser)
+  
+  # attach module to GPRS
+  ser.write(f'AT+CGATT?\r\n'.encode())
+  sleep(2)
+  print(ser.readlines(), 'AT+CGATT?')
+
+  # Close the serial connection
+  ser.close()
+  
+  
+if __name__ == "__main__":
+  main()
+  
+  

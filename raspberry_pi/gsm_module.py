@@ -2,83 +2,107 @@ import serial
 from time import sleep
 
 
-def at_command_exec(ser, com):
 
+def activate_gprs(ser):
 
-  # Send an AT command and read the response
-  ser.write(f'{com}\r\n'.encode())
+  # # check IP address
+  # ser.write(f'AT+SAPBR=2,1\r\n'.encode())
+  # sleep(2)
+  # is_valid_ip = ser.readlines()[1]
+  
+  # if not b'0.0.0.0' in is_valid_ip:
+    # print('gprs already attached with IP', is_valid_ip)
+  # else:
+    # print('gprs not attached, attaching...')
+  
+  # attach module to GPRS
+  ser.write(f'AT+CGATT=1\r\n'.encode())
   sleep(2)
-  
-  # [b'\r\n', b'869988016370054\r\n', b'\r\n', b'OK\r\n']
-  response = ser.readlines()
-  
-  return response
+  print(ser.readlines())
 
 
-def http_get(ser, url):
+  # Set conn type
+  ser.write(f'AT+SAPBR=3,1,"Contype","GPRS"\r\n'.encode())
+  sleep(2)
+  print(ser.readlines())
+
+
+  # Set the APN
+  ser.write(f'AT+SAPBR=3,1,"APN","http.globe.com.ph"\r\n'.encode())
+  sleep(2)
+  print(ser.readlines())
+
+  # Activate PDP Packet
+  ser.write(f'AT+SAPBR=1,1\r\n'.encode())
+  sleep(2)
+  print(ser.readlines())
+
+  # Query IP address
+  ser.write(f'AT+SAPBR=2,1\r\n'.encode())
+  sleep(2)
+  print(ser.readlines())
   
+
+  
+  
+  
+def http_get(ser):
+  
+
   # Start HTTP service
   ser.write(f'AT+HTTPINIT\r\n'.encode())
   sleep(2)
+  print(ser.readlines(), 'AT+HTTPINIT')
   
-  # HTTP session
+  # Enable SSL
+  ser.write(f'AT+HTTPSSL=1\r\n'.encode())
+  sleep(2)
+  print(ser.readlines(), 'AT+HTTPSSL=1')
+  
+  # Specify connection ID
   ser.write(f'AT+HTTPPARA="CID",1\r\n'.encode())
   sleep(2)
-  ser.write(f'AT+HTTPPARA="URL","{url}"\r\n'.encode())
-  sleep(2)
+  print(ser.readlines())
   
-  # Start session
-  ser.write(f'AT+HTTPACTION=0\r\n'.encode())
+  # Set Authorization Headers
+  ser.write(f'AT+HTTPPARA="CUSTOM","Authorization: Basic anN1Y2kuanN1Y2lAZ21haWwuY29tOmFkbWlu"\r\n'.encode())
   sleep(2)
-  stat_resp = ser.readlines()[1]
+  print(ser.readlines())
   
-  # Get data
-  ser.write(f'AT+HTTPREAD\r\n'.encode())
+  # Set URL parameters
+  ser.write(f'AT+HTTPPARA="URL","https://turbiditech.fly.dev/api/device-records/2"\r\n'.encode())
   sleep(2)
-  read_resp = ser.readlines()[1]
-  
-  return read_resp, stat_resp
+  print(ser.readlines())
 
-def activate_gprs(ser):
   
-  # GPRS
-  ser.write(f'AT+SAPBR=3,1,"Contype","GPRS"\r\n'.encode())
+  # Send the request
+  ser.write(f'AT+HTTPACTION=0\r\n'.encode())
+  sleep(10)
+  print(ser.readlines())
+
+
+  # Read the request
+  ser.write(f'AT+HTTPREAD\r\n'.encode())
+  sleep(10)
+  print(ser.readlines(), 'AT+HTTPREAD')
+  
+  # Terminate the HTTP service
+  ser.write(f'AT+HTTPTERM\r\n'.encode())
   sleep(2)
-  cont_resp = ser.readlines()[1]
+  print(ser.readlines(), 'AT+HTTPTERM')
   
-  # APN
-  ser.write(f'AT+SAPBR=3,1,"APN","internet.globe.com.ph"\r\n'.encode())
-  sleep(2)
-  apn_resp = ser.readlines()[1]
-  
-  # Open GPRS Context
-  ser.write(f'AT+SAPBR=1,1\r\n'.encode())
-  sleep(2)
-  open_resp = ser.readlines()[1]
-  
-  # Check IP
-  ser.write(f'AT+SAPBR=2,1\r\n'.encode())
-  sleep(2)
-  ip_resp = ser.readlines()[1]
-  
-  if (b'.' in ip_resp):
-    print('gprs activated')
-  else:
-    print('error activating gprs, check if there is enough prepaid credits.')
-  
-  
+
   
   
 def main():
   # Open a serial connection to a device with AT commands
   ser = serial.Serial("/dev/ttyS0", baudrate=115200, timeout=1)
   
-  # activate gprs
   activate_gprs(ser)
   
-  # http get
-  http_get(ser, 'https://turbiditech.fly.dev/api/device-records/2')
+  http_get(ser)
   
+
   # Close the serial connection
   ser.close()
   
