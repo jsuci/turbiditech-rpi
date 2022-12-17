@@ -5,42 +5,34 @@ from time import sleep
 
 def activate_gprs(ser):
 
-  # # check IP address
-  # ser.write(f'AT+SAPBR=2,1\r\n'.encode())
-  # sleep(2)
-  # is_valid_ip = ser.readlines()[1]
-  
-  # if not b'0.0.0.0' in is_valid_ip:
-    # print('gprs already attached with IP', is_valid_ip)
-  # else:
-    # print('gprs not attached, attaching...')
   
   # attach module to GPRS
   ser.write(f'AT+CGATT=1\r\n'.encode())
   sleep(2)
-  print(ser.readlines())
+  print(ser.readlines(), 'AT+CGATT=1')
 
 
   # Set conn type
   ser.write(f'AT+SAPBR=3,1,"Contype","GPRS"\r\n'.encode())
   sleep(2)
-  print(ser.readlines())
+  print(ser.readlines(), 'AT+SAPBR=3,1,"Contype","GPRS"')
 
 
   # Set the APN
   ser.write(f'AT+SAPBR=3,1,"APN","http.globe.com.ph"\r\n'.encode())
   sleep(2)
-  print(ser.readlines())
+  print(ser.readlines(), 'AT+SAPBR=3,1,"APN"...')
+
 
   # Activate PDP Packet
   ser.write(f'AT+SAPBR=1,1\r\n'.encode())
   sleep(2)
-  print(ser.readlines())
+  print(ser.readlines(), 'AT+SAPBR=1,1')
 
   # Query IP address
   ser.write(f'AT+SAPBR=2,1\r\n'.encode())
   sleep(2)
-  print(ser.readlines())
+  print(ser.readlines(), 'AT+SAPBR=2,1')
   
 
   
@@ -54,31 +46,22 @@ def http_get(ser):
   sleep(2)
   print(ser.readlines(), 'AT+HTTPINIT')
   
-  # Enable SSL
-  ser.write(f'AT+HTTPSSL=1\r\n'.encode())
-  sleep(2)
-  print(ser.readlines(), 'AT+HTTPSSL=1')
   
   # Specify connection ID
   ser.write(f'AT+HTTPPARA="CID",1\r\n'.encode())
   sleep(2)
-  print(ser.readlines())
-  
-  # Set Authorization Headers
-  ser.write(f'AT+HTTPPARA="CUSTOM","Authorization: Basic anN1Y2kuanN1Y2lAZ21haWwuY29tOmFkbWlu"\r\n'.encode())
-  sleep(2)
-  print(ser.readlines())
+  print(ser.readlines(), 'AT+HTTPPARA="CID"')
   
   # Set URL parameters
-  ser.write(f'AT+HTTPPARA="URL","https://turbiditech.fly.dev/api/device-records/2"\r\n'.encode())
+  ser.write(f'AT+HTTPPARA="URL","www.google.com"\r\n'.encode())
   sleep(2)
-  print(ser.readlines())
+  print(ser.readlines(), 'AT+HTTPPARA="URL","www.google.com"')
 
   
   # Send the request
   ser.write(f'AT+HTTPACTION=0\r\n'.encode())
   sleep(10)
-  print(ser.readlines())
+  print(ser.readlines(), 'AT+HTTPACTION=0')
 
 
   # Read the request
