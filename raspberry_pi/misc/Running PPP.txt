@@ -1,0 +1,14 @@
+To connect to the internet you just execute:
+sudo pon gprs
+
+Disable existing internet connection:
+sudo route del default
+
+To shut down PPP:
+sudo poff gprs
+
+To connect with debugging enabled:
+sudo pon gprs debug dump logfd 2 nodetach
+
+
+sudo minicom --device /dev/ttyS0 --baudrate 115200

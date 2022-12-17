@@ -1,6 +1,5 @@
 # rpi
 import numpy as np
-# import tensorflow as tf
 from time import sleep
 from PIL import Image
 from tflite_runtime.interpreter import Interpreter
@@ -320,7 +319,7 @@ def main():
         post_water_valve_status(w_stat=device_w_stat, v_stat=v_stat, prob=prob)
         
 
-    print('\nsleep 10 seconds.\n\n')
+    print('sleep 10 seconds.\n\n')
     sleep(10)
 
 

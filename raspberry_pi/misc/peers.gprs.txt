@@ -1,0 +1,19 @@
+connect "/usr/sbin/chat -v -f /etc/chatscripts/gprs -T http.globe.com.ph"
+
+/dev/ttyS0
+
+115200
+
+noipdefault
+
+usepeerdns
+
+defaultroute
+
+persist
+
+noauth
+
+nocrtscts
+
+local
