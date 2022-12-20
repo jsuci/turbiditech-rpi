@@ -48,6 +48,12 @@ def capture_image():
     # camera.start_preview()
     sleep(3)
     camera.capture('../images/test.jpg', quality=100)
+    
+    # compress image for upload
+    im = Image.open("../images/test.jpg")
+
+    # Set the quality to 50 (out of 100)
+    im.save("../images/test_compressed.jpg", quality=50, optimize=True)
 
 
 def read_image(w, h):
@@ -206,7 +212,7 @@ def get_device_water_status():
 def post_water_valve_status(w_stat, v_stat, prob):
 
   url = urllib.parse.urlsplit(f'https://turbiditech.fly.dev/api/device-records/{DEVICE_ID}')
-  image_path = '../images/test.jpg'
+  image_path = '../images/test_compressed.jpg'
 
   details = f'{DEVICE_NAME.upper()} has detected {prob}% {w_stat.upper()} water status. Turning {v_stat.upper()} valve.'
 
@@ -276,17 +282,13 @@ def main():
     # check server for changes in the valve status
     print('getting data from server')
     server_v_stat, server_w_status = get_server_status()
-    
+  
 
-    # the valve is normally turned ON
-    # if valve was turned off turn off valve
-    # and do not perform check_status()
-    # wait for the server to turn it back on
-
-    print(f'valve status turned {server_v_stat.upper()}')
+    print(f'valve status manually turned {server_v_stat.upper()}')
     
     # if both server and device valve is OFF
     if (server_v_stat == 'off') and (valve.value == 0):
+      valve.off()
       print('both server and device valve status are turned OFF')
       
     # if server valve is OFF and device valve is ON
@@ -298,20 +300,21 @@ def main():
     # if the valve has been turned on
     # then turn on valve base on check water status results
     if server_v_stat == 'on':
-      print('checking water status')
+      print('checking water status first')
       device_w_stat, prob = get_device_water_status()
 
       print(f'device has detected {prob}% {device_w_stat.upper()} water status.')
       
       if (server_w_status == 'clean') and (device_w_stat == 'clean'):
         print(f'no changes made to the system')
+        valve.on()
       else:
         if device_w_stat == 'clean':
           print('turn valve ON')
           valve.on()
           v_stat = 'on'
         else:
-          print('turn vavle OFF')
+          print('turn valve OFF')
           valve.off()
           v_stat = 'off'
 
