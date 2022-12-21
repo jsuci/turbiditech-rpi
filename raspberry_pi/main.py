@@ -306,8 +306,8 @@ def main():
       print(f'device has detected {prob}% {device_w_stat.upper()} water status.')
       
       if (server_w_status == 'clean') and (device_w_stat == 'clean'):
-        print(f'no changes made to the system')
         valve.on()
+        print(f'both server and device water status are CLEAN')
       else:
         if device_w_stat == 'clean':
           print('turn valve ON')
