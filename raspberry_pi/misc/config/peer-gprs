@@ -1,0 +1,14 @@
+debug
+/dev/ttyS0
+115200
+noipdefault
+usepeerdns
+defaultroute
+connect '/usr/sbin/chat -v -f /etc/ppp/chat-gprs'
+disconnect '/usr/sbin/chat -v -f /etc/ppp/chat-hangup'
+noauth
+persist
+holdoff 20
+maxfail 0
+ipcp-accept-local
+ipcp-accept-remote

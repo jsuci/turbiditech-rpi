@@ -1,0 +1,8 @@
+1. install ppp package
+	sudo apt-get install ppp
+
+2. start ppp connection
+	sudo pppd call peer-gprs
+
+3. stop ppp connection
+	sudo pkill pppd
