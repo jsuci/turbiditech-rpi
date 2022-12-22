@@ -1,0 +1,8 @@
+1. delete default connection
+	sudo route del default
+
+2. activate ppp connection
+	sudo pon rnet
+
+3. check if ip address is assigned
+	ip address | grep ppp0 | awk '/inet/ {print $2}'
