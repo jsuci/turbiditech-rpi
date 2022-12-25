@@ -1,8 +1,21 @@
-Thu 22 Dec 2022 06:57:57 PM UTC Change directory
-Thu 22 Dec 2022 06:57:57 PM UTC Activate VENV
-Thu 22 Dec 2022 06:57:57 PM UTC Unable to retrieve the IP address.
-Thu 22 Dec 2022 06:58:02 PM UTC Closing previous PPP connection.
-Thu 22 Dec 2022 06:58:07 PM UTC Starting new PPP connection.
-Thu 22 Dec 2022 06:58:13 PM UTC The IP address is 100.101.53.61
-Thu 22 Dec 2022 06:58:13 PM UTC Start detection loop.
-
+Sun 25 Dec 2022 10:04:05 AM UTC Starting new PPP connection.
+Sun 25 Dec 2022 10:04:11 AM UTC Unable to retrieve the IP address.
+Sun 25 Dec 2022 10:04:16 AM UTC Closing previous PPP connection.
+Sun 25 Dec 2022 10:04:21 AM UTC Starting new PPP connection.
+Sun 25 Dec 2022 10:04:26 AM UTC Unable to retrieve the IP address.
+Sun 25 Dec 2022 10:04:31 AM UTC Closing previous PPP connection.
+Sun 25 Dec 2022 10:04:36 AM UTC Starting new PPP connection.
+Sun 25 Dec 2022 10:04:41 AM UTC Unable to retrieve the IP address.
+Sun 25 Dec 2022 10:04:46 AM UTC Closing previous PPP connection.
+Sun 25 Dec 2022 10:04:51 AM UTC Starting new PPP connection.
+Sun 25 Dec 2022 10:04:56 AM UTC Unable to retrieve the IP address.
+Sun 25 Dec 2022 10:05:01 AM UTC Closing previous PPP connection.
+Sun 25 Dec 2022 10:05:07 AM UTC Starting new PPP connection.
+Sun 25 Dec 2022 10:05:12 AM UTC Unable to retrieve the IP address.
+Sun 25 Dec 2022 10:05:17 AM UTC Closing previous PPP connection.
+Sun 25 Dec 2022 10:05:22 AM UTC Starting new PPP connection.
+Sun 25 Dec 2022 10:05:27 AM UTC Unable to retrieve the IP address.
+Sun 25 Dec 2022 10:05:32 AM UTC Closing previous PPP connection.
+Sun 25 Dec 2022 10:05:37 AM UTC Starting new PPP connection.
+Sun 25 Dec 2022 10:05:42 AM UTC Unable to retrieve the IP address.
+Sun 25 Dec 2022 10:05:47 AM UTC Closing previous PPP connection.
