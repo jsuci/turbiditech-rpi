@@ -120,10 +120,20 @@ def main():
   # Open a serial connection to a device with AT commands
   ser = serial.Serial("/dev/ttyS0", baudrate=115200, timeout=1)
   
-  activate_ppp(ser)
+  ser.write(b'AT+CGDCONT=1,"IP","http.globe.com.ph"\r\n')
+  response = ser.read(1024).decode()
+  print(response)
+  
+  ser.write(b'ATD*99***1#\r\n')
+  response = ser.read(1024).decode()
+  print(response)
+  
+  ser.write(b'AT+CGACT?\r\n')
+  response = ser.read(1024).decode()
+  print(response)
 
   # Close the serial connection
-  # ser.close()
+  ser.close()
   
   
 if __name__ == "__main__":

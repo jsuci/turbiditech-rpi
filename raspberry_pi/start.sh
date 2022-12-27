@@ -1,8 +1,12 @@
 cd /home/turbiditech/turbiditech-rpi/raspberry_pi/
 
-bash activate_gprs.sh
+while :
+do
+  sleep 10
 
-sleep 5
+  bash activate_gprs.sh
 
-bash activate_script.sh
+  sleep 5
 
+  bash activate_script.sh
+done

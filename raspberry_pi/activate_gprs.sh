@@ -16,6 +16,10 @@ do
     echo $(date -u) "Closing previous PPP connection." | tee -a log.txt
     sudo poff rnet > /dev/null
     sleep 5
+    sudo kill -HUP 'cat /var/run/ppp0.pid'
+    sleep 5
+    sudo route del default
+    sleep 5
     echo $(date -u) "Starting new PPP connection." | tee -a log.txt
     sudo pon rnet
     sleep 5
