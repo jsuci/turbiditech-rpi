@@ -4,7 +4,7 @@ while :
 do
   sleep 10
 
-  bash activate_gprs.sh
+ # bash activate_gprs.sh
 
   sleep 5
 

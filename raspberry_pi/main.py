@@ -261,7 +261,7 @@ def post_water_valve_status(w_stat, v_stat, prob):
     'Authorization': f'Basic {b64encode(bytes(f"{EMAIL}:{PASSWORD}", "utf-8")).decode("ISO-8859-1")}',
     'Content-type': f'multipart/form-data; boundary={boundary}'
   }
-  conn.request("POST", "/api/device-records/2", payload, headers)
+  conn.request("POST", f"/api/device-records/{DEVICE_ID}", payload, headers)
   res = conn.getresponse()
 
   # data = res.read()
