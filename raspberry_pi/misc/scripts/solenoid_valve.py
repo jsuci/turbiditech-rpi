@@ -1,34 +1,34 @@
-# from gpiozero import DigitalOutputDevice, LED
-# from time import sleep
-# import RPi.GPIO as GPIO
+#from gpiozero import DigitalOutputDevice
+#from time import sleep
+#
+#valve = DigitalOutputDevice(14)
 
-# GPIO.setwarnings(False)
-# GPIO.setmode(GPIO.BCM)
-
-# GPIO.setup(18, GPIO.OUT)
-
-# while True:
-  # print('opening valve')
-  # GPIO.output(18, 1)
-  # print('sleep')
-  # sleep(10)
-  # print('closing valve')
-  # GPIO.output(18, 0)
-  # sleep(10)
-
-from gpiozero import DigitalOutputDevice
+import OPi.GPIO as GPIO
 from time import sleep
 
-valve = DigitalOutputDevice(18)
+# Set the pin numbering mode
+GPIO.setmode(GPIO.BOARD)
+
+# Set pin 12 as an output pin
+GPIO.setup(11, GPIO.OUT)
+
+
+
+
 
 while True:
   print('ON valve')
-  valve.on()
-  print(valve.value)
+  GPIO.output(11, GPIO.HIGH)
+  print('The current value of the pin is', GPIO.input(11))
   print('sleep 5s\n\n')
   sleep(5)
+
+
   print('OFF valve')
-  valve.off()
-  print(valve.value)
+  GPIO.output(11, GPIO.LOW)
+  print('The current value of the pin is', GPIO.input(11))
   print('sleep 5s\n\n')
   sleep(5)
+
+# Cleanup the GPIO settings
+GPIO.cleanup()
