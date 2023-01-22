@@ -1,0 +1,6 @@
+sudo pon rnet (turn on gprs)
+sudo poff rnet (turn off gprs)
+
+route -n (check 0.0.0.0 for default route)
+
+armbian-config -> Hardware -> uart3
