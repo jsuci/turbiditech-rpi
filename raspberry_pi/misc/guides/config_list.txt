@@ -1,6 +1,44 @@
-sudo pon rnet (turn on gprs)
-sudo poff rnet (turn off gprs)
+#turn ON GPRS
+sudo pon rnet
 
-route -n (check 0.0.0.0 for default route)
+#turn OFF GPRS
+sudo poff rnet
 
+#check default route
+route -n
+
+#add default route with ip gateway
+sudo route add default gw <ip> dev eth0
+
+#delete default route
+sudo route del default
+
+
+#add ppp0 as default route
+sudo route add default  dev ppp0
+
+
+#activate ttyS3
 armbian-config -> Hardware -> uart3
+
+#wiringOP
+git clone https://github.com/orangepi-xunlong/wiringOP
+
+#build
+./build clean
+./build
+
+#display GPIO output
+gpio readall
+
+
+#set wPi to OUT mode
+gpio mode 2 out
+
+
+#turn OFF pin
+gpio write 2 0
+
+
+#turn ON pin
+gpio write 2 1
