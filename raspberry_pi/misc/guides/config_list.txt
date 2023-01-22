@@ -4,6 +4,7 @@ sudo pon rnet
 #turn OFF GPRS
 sudo poff rnet
 
+<<<<<<< HEAD
 #check default route
 route -n
 
@@ -20,6 +21,9 @@ sudo route add default  dev ppp0
 
 #activate ttyS3
 armbian-config -> Hardware -> uart3
+=======
+armbian-config -> Hardware -> uart3 (activate ttyS3)
+>>>>>>> 8b79651b08e8b574082b5bba288c5e92c22efbbd
 
 #wiringOP
 git clone https://github.com/orangepi-xunlong/wiringOP
