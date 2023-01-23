@@ -1,10 +1,14 @@
-# rpi
-import numpy as np
+# opi
+import OPi.GPIO as GPIO
 from time import sleep
+
+
+# ml
+import numpy as np
+import subprocess
 from PIL import Image
 from tflite_runtime.interpreter import Interpreter
-from picamera import PiCamera
-from gpiozero import DigitalOutputDevice
+
 
 # api
 import requests
@@ -25,56 +29,47 @@ DEVICE_NAME = os.getenv('DEVICE_NAME')
 EMAIL = os.getenv('EMAIL')
 PASSWORD = os.getenv('PASSWORD')
 
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(12, GPIO.OUT)
+
 
 # obtaining data
 def capture_image():
-  
-  # capture image using PiCamera
-  with PiCamera() as camera:
-    
-    camera.resolution = (300, 300)
-    camera.zoom = (0.3, 0.3, 1.0, 1.0)
+    # capture video
+    duration = 10
+    cmd = "ffmpeg -f v4l2 -i /dev/video1 -s 320x240 -r 25 -t {} -c:v libx264 -pix_fmt yuv420p -qp 0 -preset fast -y media/video.mp4".format(duration)
+    subprocess.run(cmd, shell=True)
+    sleep(5)
 
-    # warm up camera
-    sleep(3)
-    
-    # adjusting the blue tint on low light env
-    # camera.awb_mode = 'auto'
-    camera.drc_strength = 'high'
-    camera.image_effect = 'denoise'
-    
-        
-    # preview and capture image
-    # camera.start_preview()
-    sleep(3)
-    camera.capture('../images/test.jpg', quality=100)
-    
+    # capture image
+    cmd = "ffmpeg -sseof -3 -i media/video.mp4 -vsync 0 -q:v 2 -update true -y media/image.jpg"
+    subprocess.call(cmd, shell=True)
+    sleep(5)
+
     # compress image for upload
-    im = Image.open("../images/test.jpg")
+    im = Image.open("media/image.jpg")
 
     # Set the quality to 50 (out of 100)
-    im.save("../images/test_compressed.jpg", quality=50, optimize=True)
+    im.save("media/image_compressed.jpg", quality=50, optimize=True)
 
 
 def read_image(w, h):
-  image_path='../images/test.jpg'
-  img = Image.open(image_path).convert('RGB')
+  image_path='media/image.jpg'
 
+  with Image.open(image_path) as img:
 
-  # crop image to center
-  # frac = 0.70
-  # left = img.size[0] * ((1-frac)/2)
-  # upper = img.size[1] * ((1-frac)/2)
-  # right = img.size[0] - ((1-frac)/2) * img.size[0]
-  # bottom = img.size[1] - ((1-frac)/2) * img.size[1]
-  # img = img.crop((left, upper, right, bottom))
+    # crop image to center
+    frac = 0.70
+    left = img.size[0] * ((1-frac)/2)
+    upper = img.size[1] * ((1-frac)/2)
+    right = img.size[0] - ((1-frac)/2) * img.size[0]
+    bottom = img.size[1] - ((1-frac)/2) * img.size[1]
+    img = img.crop((left, upper, right, bottom))
+    img = img.resize((w, h))
 
-  img = img.resize((224, 224))
-  
-  # show image
-  # img.show()
-
-  return img
+    # Display the image
+    img.show(command='eog')
 
 
 # process data

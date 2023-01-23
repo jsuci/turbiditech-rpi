@@ -6,9 +6,6 @@ GPIO.setmode(GPIO.BOARD)
 GPIO.setup(12, GPIO.OUT)
 
 
-
-
-
 while True:
   print('ON valve')
   GPIO.output(12, GPIO.HIGH)
