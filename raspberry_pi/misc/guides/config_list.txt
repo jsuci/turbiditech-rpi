@@ -4,26 +4,25 @@ sudo pon rnet
 #turn OFF GPRS
 sudo poff rnet
 
-<<<<<<< HEAD
+
 #check default route
 route -n
+(U - up, UH - unreachable host, UG - up and gateway)
 
 #add default route with ip gateway
-sudo route add default gw <ip> dev eth0
+sudo route add default gw 192.168.1.1 eth0
 
 #delete default route
 sudo route del default
 
 
 #add ppp0 as default route
-sudo route add default  dev ppp0
+sudo route add default ppp0
 
 
 #activate ttyS3
-armbian-config -> Hardware -> uart3
-=======
 armbian-config -> Hardware -> uart3 (activate ttyS3)
->>>>>>> 8b79651b08e8b574082b5bba288c5e92c22efbbd
+
 
 #wiringOP
 git clone https://github.com/orangepi-xunlong/wiringOP
@@ -50,3 +49,38 @@ gpio write 2 1
 
 #video capture
 ffmpeg -f v4l2 -i /dev/video1 -s 320x240 -r 25 -t 20 -c:v libx264 -pix_fmt yuv420p -qp 0 -preset fast video.mp4
+
+
+#run bash script on boot using systemd
+1. Create a new file in the /etc/systemd/system directory with the name "turbiditech.service", for example.
+
+Open the file using a text editor and add the following code:
+[Unit]
+Description=Turbiditech Service
+
+[Service]
+ExecStart=/root/turbiditech-rpi/raspberry_pi/initial_boot.sh
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target
+
+Change the permissions of the service file with the chmod command. For example, to give execute permission to the owner of the file and read permission to everyone else:
+sudo chmod 755 /etc/systemd/system/turbiditech.service
+
+2. Run the following command to reload the systemd configuration:
+sudo systemctl daemon-reload
+
+
+3. Enable the service so it will start on boot:
+sudo systemctl enable turbiditech.service
+
+4. Start the service:
+sudo systemctl start turbiditech.service
+
+5. You can check the status of the service with:
+sudo systemctl status turbiditech.service
+
+6. You can also stop, start or restart the service using the command:
+sudo systemctl [stop|start|restart] myscript.service
