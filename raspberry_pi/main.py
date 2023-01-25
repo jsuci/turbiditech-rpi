@@ -309,7 +309,7 @@ def main():
                 # to prevent same results being uploaded to server
                 if server_w_status == device_w_stat and server_v_stat == device_v_stat:
                     if count_detection == 0:
-                        details = f'both server and device water status is CLEAN and valve status is ON'
+                        details = f'both server and device water status is CLEAN and valve status is ON. This update will only repeat once.'
 
 
                         print('both server and device water status is CLEAN and valve status is ON, sending data to server once')
