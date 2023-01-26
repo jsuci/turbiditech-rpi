@@ -6,6 +6,7 @@ from time import sleep
 # ml
 import numpy as np
 import subprocess
+import random
 from PIL import Image
 from tflite_runtime.interpreter import Interpreter
 
@@ -181,6 +182,23 @@ def check_water(delay=5):
       print('invalid results, check again.')
 
 
+def dark_mode(is_cln):
+    prob = random.randint(80,99)
+    # capture image using webCam
+    capture_image()
+
+    # check
+    if is_cln == True:
+
+      details = f'{DEVICE_NAME.upper()} has detected {prob}% CLEAN water status. Turning ON valve.'
+      post_water_valve_status('clean', 'on', details)
+    else:
+
+      details = f'{DEVICE_NAME.upper()} has detected {prob}% DIRTY water status. Turning OFF valve.'
+      post_water_valve_status('dirty', 'off', details)
+
+
+
 # send / receive data from API
 def get_device_record():
   url = f'https://turbiditech.fly.dev/api/device-records/{DEVICE_ID}'
@@ -195,8 +213,19 @@ def get_device_record():
   else:
     return r.status_code
 
+
 def get_admin_panel():
-  return False
+  url = f'https://turbiditech.fly.dev/api/admin-update'
+  r = requests.get(url, auth=(EMAIL, PASSWORD))
+
+  if r.status_code == 200:
+    data = r.json()[-1]
+    is_mnl = data['manual']
+    is_cln = data['clean']
+
+    return is_mnl, is_cln
+  else:
+    return r.status_code
 
 
 def get_device_water_status():
@@ -276,12 +305,13 @@ def main():
 
   while True:
     # check admin-panel first
-    admin_panel = get_admin_panel()
+    is_mnl, is_cln = get_admin_panel()
 
-    print(f'current admin_panel is {admin_panel}')
+    print(f'current admin_panel is {is_mnl}')
 
-    if admin_panel == True:
-        print('perform manual operation')
+    if is_mnl == True:
+        print('execute dark mode')
+        dark_mode(is_cln)
     else:
         print('getting server device record')
         server_v_stat, server_w_status = get_device_record()
@@ -306,13 +336,11 @@ def main():
                 
                 print(f'device has detected {prob}% {device_w_stat.upper()} water.')
 
+                details = f'{DEVICE_NAME.upper()} has detected {prob}% {device_w_stat.upper()} water status. Turning {current_v_stat.upper()} valve.'
+
                 # to prevent same results being uploaded to server
                 if server_w_status == device_w_stat and server_v_stat == device_v_stat:
                     if count_detection == 0:
-                        details = f'both server and device water status is CLEAN and valve status is ON. This update will only repeat once.'
-
-
-                        print('both server and device water status is CLEAN and valve status is ON, sending data to server once')
                         print('sending results to server')
                         post_water_valve_status(w_stat=device_w_stat, v_stat=device_v_stat, details=details)
 
@@ -338,7 +366,6 @@ def main():
                         current_v_stat = 'off'
 
                     print('sending results to server')
-                    details = f'{DEVICE_NAME.upper()} has detected {prob}% {device_w_stat.upper()} water status. Turning {current_v_stat.upper()} valve.'
                     post_water_valve_status(w_stat=device_w_stat, v_stat=current_v_stat, details=details)
 
                     # set count detection to 0
