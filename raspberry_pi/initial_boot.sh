@@ -1,11 +1,18 @@
 #!/bin/bash
 
+echo $(date -u) "Delay script execution for 10s" | tee -a log.txt
+sleep 10
+
+
+echo $(date -u) "Chnage directory to raspberry_pi folder." | tee -a log.txt
 cd /root/turbiditech-rpi/raspberry_pi/
+sleep 2
 
 echo $(date -u) "Starting to connect to GPRS via GSM module" | tee -a log.txt
+
 # Initialize the variable to store the IP address
 ip_address=""
-delay=3
+delay=5
 
 # Run the loop until the IP address is not empty
 while [ -z "$ip_address" ];
@@ -16,31 +23,40 @@ do
   # If the IP address is empty, print a message and continue the loop
   if [ -z "$ip_address" ]; then
     echo $(date -u) "Unable to retrieve the IP address." | tee -a log.txt
-    sleep $delay
-    echo $(date -u) "Close previous PPP connection." | tee -a log.txt
+    sleep 1
+    echo $(date -u) "Closing previous PPP connection." | tee -a log.txt
     sudo poff rnet > /dev/null
     sleep $delay
-    echo $(date -u) "Delete existing ppp0 gateway." | tee -a log.txt
-    sudo route del default ppp0
-    echo $(date -u) "Delete existing eth0 gateway." | tee -a log.txt
-    sudo route del default eth0
-    sleep $delay
-    echo $(date -u) "Start new PPP connection." | tee -a log.txt
+    sudo kill -HUP 'cat /var/run/ppp0.id'
+    sleep 2
+#    sudo route del default
+#    sleep 2
+    echo $(date -u) "Starting new PPP connection." | tee -a log.txt
     sudo pon rnet
-    sleep $delay
+    sleep 10
   fi
 done
 
 echo $(date -u) "The IP address is $ip_address" | tee -a log.txt
-sleep $delay
+sleep 2
 
-echo $(date -u) "Add ppp0 to default route" | tee -a log.txt
-sudo route add default ppp0
 
-sleep $delay
+#destination_ip=$(ifconfig ppp0 | awk '/destination/ {print $6}')
+#echo $(date -u) "The destination IP address is $destination_ip" | tee -a log.txt
+#sleep 2
+
+
+echo $(date -u) "Add 192.168.254.254 destination IP address to default route" | tee -a log.txt
+route del default ppp0
+route del default eth0
+route add default gw 192.168.254.254 ppp0
+sleep 3
+
+
 echo $(date -u) "Start initial_boot_update.py script" | tee -a log.txt
 python3 initial_boot_update.py
 
-sleep $delay
+
+sleep 3
 echo $(date -u) "Start main.py script" | tee -a log.txt
 python3 main.py
