@@ -189,9 +189,11 @@ def dark_mode(is_cln, is_hld):
       capture_image()
 
       if is_cln == True:
+        GPIO.output(12, GPIO.HIGH)
         details = f'{DEVICE_NAME.upper()} has detected {prob}% CLEAN water status. Turning ON valve.'
         post_water_valve_status('clean', 'on', details)
       else:
+        GPIO.output(12, GPIO.LOW)
         details = f'{DEVICE_NAME.upper()} has detected {prob}% DIRTY water status. Turning OFF valve.'
         post_water_valve_status('dirty', 'off', details)
     else:
