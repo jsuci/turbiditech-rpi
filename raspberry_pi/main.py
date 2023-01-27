@@ -183,12 +183,11 @@ def check_water(delay=5):
 
 
 def dark_mode(is_cln, is_hld):
-    prob = random.randint(80,99)
-    # capture image using webCam
-    capture_image()
 
-    # on_hold
     if is_hld == False:
+      prob = random.randint(80,99)
+      capture_image()
+
       if is_cln == True:
         details = f'{DEVICE_NAME.upper()} has detected {prob}% CLEAN water status. Turning ON valve.'
         post_water_valve_status('clean', 'on', details)
