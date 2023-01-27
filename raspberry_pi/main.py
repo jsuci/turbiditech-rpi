@@ -374,8 +374,8 @@ def main():
                     print('set count_detection to 0')
                     count_detection = 0
 
-    print('perform detection again in 5 seconds.\n\n')
-    sleep(5)
+    print('perform detection again in 10 seconds.\n\n')
+    sleep(10)
 
 
 
