@@ -85,7 +85,7 @@ def main():
     else:
         device_v_stat = 'off'
 
-    details = f'Initial boot completed. Device is connected the internet via GPRS connection. Valve operation set to default state {device_v_stat.upper()}.'
+    details = f'Initial boot completed. Device is connected the internet. Valve operation set to default state {device_v_stat.upper()}.'
     print(details)
 
     post_initial_boot_status(device_v_stat, details)

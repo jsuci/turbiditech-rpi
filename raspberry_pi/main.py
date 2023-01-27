@@ -219,9 +219,9 @@ def get_admin_panel():
   r = requests.get(url, auth=(EMAIL, PASSWORD))
 
   if r.status_code == 200:
-    data = r.json()[-1]
+    data = r.json()
     is_mnl = data['manual']
-    is_cln = data['clean']
+    is_cln = data['is_clean']
 
     return is_mnl, is_cln
   else:
