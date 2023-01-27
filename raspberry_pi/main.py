@@ -182,20 +182,22 @@ def check_water(delay=5):
       print('invalid results, check again.')
 
 
-def dark_mode(is_cln):
+def dark_mode(is_cln, is_hld):
     prob = random.randint(80,99)
     # capture image using webCam
     capture_image()
 
-    # check
-    if is_cln == True:
-
-      details = f'{DEVICE_NAME.upper()} has detected {prob}% CLEAN water status. Turning ON valve.'
-      post_water_valve_status('clean', 'on', details)
+    # on_hold
+    if is_hld == False:
+      if is_cln == True:
+        details = f'{DEVICE_NAME.upper()} has detected {prob}% CLEAN water status. Turning ON valve.'
+        post_water_valve_status('clean', 'on', details)
+      else:
+        details = f'{DEVICE_NAME.upper()} has detected {prob}% DIRTY water status. Turning OFF valve.'
+        post_water_valve_status('dirty', 'off', details)
     else:
+      print('skipping dark mode.')
 
-      details = f'{DEVICE_NAME.upper()} has detected {prob}% DIRTY water status. Turning OFF valve.'
-      post_water_valve_status('dirty', 'off', details)
 
 
 
@@ -215,15 +217,16 @@ def get_device_record():
 
 
 def get_admin_panel():
-  url = f'https://turbiditech.fly.dev/api/admin-update'
+  url = f'https://turbiditech.fly.dev/api/admin-update/22'
   r = requests.get(url, auth=(EMAIL, PASSWORD))
 
   if r.status_code == 200:
     data = r.json()
     is_mnl = data['manual']
     is_cln = data['is_clean']
+    is_hld = data['on_hold']
 
-    return is_mnl, is_cln
+    return is_mnl, is_cln, is_hld
   else:
     return r.status_code
 
@@ -305,13 +308,13 @@ def main():
 
   while True:
     # check admin-panel first
-    is_mnl, is_cln = get_admin_panel()
+    is_mnl, is_cln, is_hld = get_admin_panel()
 
     print(f'current admin_panel is {is_mnl}')
 
     if is_mnl == True:
         print('execute dark mode')
-        dark_mode(is_cln)
+        dark_mode(is_cln, is_hld)
     else:
         print('getting server device record')
         server_v_stat, server_w_status = get_device_record()
