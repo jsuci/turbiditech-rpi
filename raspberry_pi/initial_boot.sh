@@ -1,10 +1,10 @@
 #!/bin/bash
 
-echo $(date -u) "Delay script execution for 10s" | tee -a log.txt
-sleep 10
+echo $(date -u) "Delay script execution for 3s" | tee -a log.txt
+sleep 3
 
 
-echo $(date -u) "Chnage directory to raspberry_pi folder." | tee -a log.txt
+echo $(date -u) "Change directory to raspberry_pi folder." | tee -a log.txt
 cd /root/turbiditech-rpi/raspberry_pi/
 sleep 2
 
