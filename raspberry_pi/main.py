@@ -183,6 +183,12 @@ def check_water(delay=5):
 
 
 def dark_mode(is_cln, is_hld):
+    server_v_stat, server_w_status = get_device_record()\
+
+    if server_v_stat == 'off':
+      GPIO.output(12, GPIO.LOW)
+      print('valve manually turned off. skipping detection')
+      return False
 
     if is_hld == False:
       prob = random.randint(80,99)
