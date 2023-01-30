@@ -335,3 +335,7 @@ Thu 26 Jan 2023 07:17:29 PM UTC Start initial_boot_update.py script
 Fri 27 Jan 2023 01:32:27 AM UTC Start main.py script
 Thu 26 Jan 2023 07:17:25 PM UTC Start initial_boot_update.py script
 Fri 27 Jan 2023 01:42:49 AM UTC Start main.py script
+Mon 30 Jan 2023 02:44:43 AM UTC Delay script execution for 3s
+Mon 30 Jan 2023 02:44:46 AM UTC Change directory to raspberry_pi folder.
+Mon 30 Jan 2023 02:44:48 AM UTC Start initial_boot_update.py script
+Mon 30 Jan 2023 02:44:54 AM UTC Start main.py script
