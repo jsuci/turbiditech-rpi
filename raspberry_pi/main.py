@@ -182,22 +182,47 @@ def check_water(delay=5):
       print('invalid results, check again.')
 
 
-def dark_mode(is_cln, is_hld):
+def admin_update(is_cln, is_hld):
+    admin_update_count = 0
 
-    if is_hld == False:
-      prob = random.randint(80,99)
-      capture_image()
+    print('getting server device record -au')
+    server_v_stat, server_w_status = get_device_record()
 
-      if is_cln == True:
-        GPIO.output(12, GPIO.HIGH)
-        details = f'{DEVICE_NAME.upper()} has detected {prob}% CLEAN water status. Turning ON valve.'
-        post_water_valve_status('clean', 'on', details)
-      else:
-        GPIO.output(12, GPIO.LOW)
-        details = f'{DEVICE_NAME.upper()} has detected {prob}% DIRTY water status. Turning OFF valve.'
-        post_water_valve_status('dirty', 'off', details)
+
+    # get current device valve status
+    if GPIO.input(12) == 1:
+      device_v_stat = 'on'
     else:
-      print('skipping dark mode.')
+      device_v_stat = 'off'
+      print(f'valve has been manually turned {server_v_stat.upper()} -au')
+
+
+
+
+
+
+
+#    if server_v_stat == 'off':
+#      print('valve turned off on the server')
+#      GPIO.output(12, GPIO.LOW)
+#    else:
+#      print('valve turned off on the server')
+      
+
+#    if is_hld == False:
+#      prob = random.randint(80,99)
+#      capture_image()
+
+#      if is_cln == True:
+#        GPIO.output(12, GPIO.HIGH)
+#        details = f'{DEVICE_NAME.upper()} has detected {prob}% CLEAN water status. Turning ON valve.'
+#        post_water_valve_status('clean', 'on', details)
+#      else:
+#        GPIO.output(12, GPIO.LOW)
+#        details = f'{DEVICE_NAME.upper()} has detected {prob}% DIRTY water status. Turning OFF valve.'
+#        post_water_valve_status('dirty', 'off', details)
+#    else:
+#      print('skipping dark mode.')
 
 
 
@@ -314,8 +339,8 @@ def main():
     print(f'current admin_panel is {is_mnl}')
 
     if is_mnl == True:
-        print('execute dark mode')
-        dark_mode(is_cln, is_hld)
+        print('execute admin_update')
+        admin_update(is_cln, is_hld)
     else:
         print('getting server device record')
         server_v_stat, server_w_status = get_device_record()
@@ -376,8 +401,8 @@ def main():
                     print('set count_detection to 0')
                     count_detection = 0
 
-    print('perform detection again in 10 seconds.\n\n')
-    sleep(10)
+    print('perform detection again in 30 seconds.\n\n')
+    sleep(30)
 
 
 

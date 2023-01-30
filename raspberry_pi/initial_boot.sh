@@ -56,7 +56,8 @@ sleep 2
 echo $(date -u) "Start initial_boot_update.py script" | tee -a log.txt
 python3 initial_boot_update.py
 
-
-sleep 3
-echo $(date -u) "Start main.py script" | tee -a log.txt
-python3 main.py
+while true; do
+  sleep 3
+  echo $(date -u) "Start main.py script" | tee -a log.txt
+  python3 main.py
+done
