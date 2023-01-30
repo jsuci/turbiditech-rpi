@@ -182,28 +182,20 @@ def check_water(delay=5):
       print('invalid results, check again.')
 
 
-def dark_mode(is_cln, is_hld):
-    server_v_stat, server_w_status = get_device_record()\
+def admin_update(is_cln):
+  prob = random.randint(80,99)
+  capture_image()
 
-    if server_v_stat == 'off':
-      GPIO.output(12, GPIO.LOW)
-      print('valve manually turned off. skipping detection')
-      return False
+  if is_cln == True:
+    GPIO.output(12, GPIO.HIGH)
+    details = f'{DEVICE_NAME.upper()} has detected {prob}% CLEAN water status. Turning ON valve.'
+    post_water_valve_status('clean', 'on', details)
 
-    if is_hld == False:
-      prob = random.randint(80,99)
-      capture_image()
+  else:
+    GPIO.output(12, GPIO.LOW)
+    details = f'{DEVICE_NAME.upper()} has detected {prob}% DIRTY water status. Turning OFF valve.'
+    post_water_valve_status('dirty', 'off', details)
 
-      if is_cln == True:
-        GPIO.output(12, GPIO.HIGH)
-        details = f'{DEVICE_NAME.upper()} has detected {prob}% CLEAN water status. Turning ON valve.'
-        post_water_valve_status('clean', 'on', details)
-      else:
-        GPIO.output(12, GPIO.LOW)
-        details = f'{DEVICE_NAME.upper()} has detected {prob}% DIRTY water status. Turning OFF valve.'
-        post_water_valve_status('dirty', 'off', details)
-    else:
-      print('skipping dark mode.')
 
 
 
@@ -317,14 +309,37 @@ def main():
     # check admin-panel first
     is_mnl, is_cln, is_hld = get_admin_panel()
 
-    print(f'current admin_panel is {is_mnl}')
+    if is_cln == True:
+       device_w_stat = 'clean'
+    else:
+       device_w_stat = 'dirty'
+
+    print('getting server device record')
+    server_v_stat, server_w_status = get_device_record()
+
+    # get current device valve status
+    if GPIO.input(12) == 1:
+      device_v_stat = 'on'
+    else:
+      device_v_stat = 'off'
+
 
     if is_mnl == True:
-        print('execute dark mode')
-        dark_mode(is_cln, is_hld)
+        if server_v_stat == 'off':
+          GPIO.output(12, GPIO.LOW)
+          print('valve is off, skipping detection')
+        else:
+          if server_v_stat != device_v_stat:
+            print('server and device valve status is different, check water status')
+            admin_update(is_cln)
+          else:
+            print('server and device valve status are the same')
+            if server_w_status != device_w_stat:
+              print('server and device water status is different, check water status')
+              admin_update(is_cln)
+            else:
+              print('server and device water status is the same, skipping')
     else:
-        print('getting server device record')
-        server_v_stat, server_w_status = get_device_record()
         
         # get current device valve status
         if GPIO.input(12) == 1:
@@ -382,8 +397,8 @@ def main():
                     print('set count_detection to 0')
                     count_detection = 0
 
-    print('perform detection again in 30 seconds.\n\n')
-    sleep(30)
+    print('perform detection again in 5 seconds.\n\n')
+    sleep(5)
 
 
 

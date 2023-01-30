@@ -339,3 +339,61 @@ Mon 30 Jan 2023 02:44:43 AM UTC Delay script execution for 3s
 Mon 30 Jan 2023 02:44:46 AM UTC Change directory to raspberry_pi folder.
 Mon 30 Jan 2023 02:44:48 AM UTC Start initial_boot_update.py script
 Mon 30 Jan 2023 02:44:54 AM UTC Start main.py script
+Mon 30 Jan 2023 02:52:38 AM UTC Delay script execution for 3s
+Mon 30 Jan 2023 02:52:41 AM UTC Change directory to raspberry_pi folder.
+Mon 30 Jan 2023 02:52:43 AM UTC Start initial_boot_update.py script
+Mon 30 Jan 2023 02:52:48 AM UTC Start main.py script
+Mon 30 Jan 2023 03:04:58 AM UTC Delay script execution for 3s
+Mon 30 Jan 2023 03:05:01 AM UTC Change directory to raspberry_pi folder.
+Mon 30 Jan 2023 03:05:03 AM UTC Start initial_boot_update.py script
+Mon 30 Jan 2023 03:05:08 AM UTC Start main.py script
+Mon 30 Jan 2023 03:05:11 AM UTC Start main.py script
+Mon 30 Jan 2023 03:05:24 AM UTC Delay script execution for 3s
+Mon 30 Jan 2023 03:05:27 AM UTC Change directory to raspberry_pi folder.
+Mon 30 Jan 2023 03:05:29 AM UTC Start initial_boot_update.py script
+Mon 30 Jan 2023 03:05:34 AM UTC Start main.py script
+Mon 30 Jan 2023 03:07:34 AM UTC Delay script execution for 3s
+Mon 30 Jan 2023 03:07:37 AM UTC Change directory to raspberry_pi folder.
+Mon 30 Jan 2023 03:07:39 AM UTC Start initial_boot_update.py script
+Mon 30 Jan 2023 03:07:44 AM UTC Start main.py script
+Mon 30 Jan 2023 03:17:30 AM UTC Delay script execution for 3s
+Mon 30 Jan 2023 03:17:33 AM UTC Change directory to raspberry_pi folder.
+Mon 30 Jan 2023 03:17:35 AM UTC Start initial_boot_update.py script
+Mon 30 Jan 2023 03:17:40 AM UTC Start main.py script
+Mon 30 Jan 2023 03:18:28 AM UTC Delay script execution for 3s
+Mon 30 Jan 2023 03:18:32 AM UTC Change directory to raspberry_pi folder.
+Mon 30 Jan 2023 03:18:34 AM UTC Start initial_boot_update.py script
+Mon 30 Jan 2023 03:18:39 AM UTC Start main.py script
+Mon 30 Jan 2023 03:23:27 AM UTC Delay script execution for 3s
+Mon 30 Jan 2023 03:23:30 AM UTC Change directory to raspberry_pi folder.
+Mon 30 Jan 2023 03:23:32 AM UTC Start initial_boot_update.py script
+Mon 30 Jan 2023 03:23:37 AM UTC Start main.py script
+Mon 30 Jan 2023 03:24:21 AM UTC Delay script execution for 3s
+Mon 30 Jan 2023 03:24:24 AM UTC Change directory to raspberry_pi folder.
+Mon 30 Jan 2023 03:24:26 AM UTC Start initial_boot_update.py script
+Mon 30 Jan 2023 03:24:31 AM UTC Start main.py script
+Mon 30 Jan 2023 03:31:53 AM UTC Delay script execution for 3s
+Mon 30 Jan 2023 03:31:56 AM UTC Change directory to raspberry_pi folder.
+Mon 30 Jan 2023 03:31:58 AM UTC Start initial_boot_update.py script
+Mon 30 Jan 2023 03:32:03 AM UTC Start main.py script
+Mon 30 Jan 2023 03:38:41 AM UTC Delay script execution for 3s
+Mon 30 Jan 2023 03:38:44 AM UTC Change directory to raspberry_pi folder.
+Mon 30 Jan 2023 03:38:46 AM UTC Start initial_boot_update.py script
+Mon 30 Jan 2023 03:38:52 AM UTC Start main.py script
+Mon 30 Jan 2023 03:43:09 AM UTC Delay script execution for 3s
+Mon 30 Jan 2023 03:43:12 AM UTC Change directory to raspberry_pi folder.
+Mon 30 Jan 2023 03:43:14 AM UTC Start initial_boot_update.py script
+Mon 30 Jan 2023 03:43:25 AM UTC Start main.py script
+Mon 30 Jan 2023 03:48:46 AM UTC Delay script execution for 3s
+Mon 30 Jan 2023 03:48:49 AM UTC Change directory to raspberry_pi folder.
+Mon 30 Jan 2023 03:48:51 AM UTC Start initial_boot_update.py script
+Mon 30 Jan 2023 03:48:56 AM UTC Start main.py script
+Mon 30 Jan 2023 03:52:52 AM UTC Delay script execution for 3s
+Mon 30 Jan 2023 03:52:55 AM UTC Change directory to raspberry_pi folder.
+Mon 30 Jan 2023 03:52:57 AM UTC Start initial_boot_update.py script
+Mon 30 Jan 2023 03:53:02 AM UTC Start main.py script
+Mon 30 Jan 2023 03:54:07 AM UTC Start main.py script
+Mon 30 Jan 2023 03:54:30 AM UTC Delay script execution for 3s
+Mon 30 Jan 2023 03:54:33 AM UTC Change directory to raspberry_pi folder.
+Mon 30 Jan 2023 03:54:35 AM UTC Start initial_boot_update.py script
+Mon 30 Jan 2023 03:54:41 AM UTC Start main.py script
