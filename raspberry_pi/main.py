@@ -351,7 +351,7 @@ def main():
         
         if (server_v_stat == 'off'):
             GPIO.output(12, GPIO.LOW)
-            print(f'valve GPIO pin set to {GPIO.input(12)}')
+            print(f'current valve GPIO pin set to {GPIO.input(12)}')
             print(f'skipping water turbidity detection as of this moment.')
         else:
 
@@ -361,11 +361,11 @@ def main():
                 
                 print(f'device has detected {prob}% {device_w_stat.upper()} water.')
 
-                details = f'{DEVICE_NAME.upper()} has detected {prob}% {device_w_stat.upper()} water status. Turning {current_v_stat.upper()} valve.'
-
                 # to prevent same results being uploaded to server
                 if server_w_status == device_w_stat and server_v_stat == device_v_stat:
                     if count_detection == 0:
+
+                        details = f'{DEVICE_NAME.upper()} has detected {prob}% {device_w_stat.upper()} water status. Turning {device_v_stat.upper()} valve.'
                         print('sending results to server')
                         post_water_valve_status(w_stat=device_w_stat, v_stat=device_v_stat, details=details)
 
@@ -379,19 +379,19 @@ def main():
                     # detection is clean
                     if device_w_stat == 'clean':
                         GPIO.output(12, GPIO.HIGH)
-                        print(f'valve GPIO pin set to {GPIO.input(12)}')
+                        print(f'valve GPIO pin set to {GPIO.input(12)} (ON)')
 
-                        current_v_stat = 'on'
+                        device_v_stat = 'on'
 
                     # detection is dirty
                     if device_w_stat == 'dirty':
                         GPIO.output(12, GPIO.LOW)
-                        print(f'valve GPIO pin set to {GPIO.input(12)}')
+                        print(f'valve GPIO pin set to {GPIO.input(12)} (OFF)')
 
-                        current_v_stat = 'off'
+                        device_v_stat = 'off'
 
                     print('sending results to server')
-                    post_water_valve_status(w_stat=device_w_stat, v_stat=current_v_stat, details=details)
+                    post_water_valve_status(w_stat=device_w_stat, v_stat=device_v_stat, details=details)
 
                     # set count detection to 0
                     print('set count_detection to 0')
