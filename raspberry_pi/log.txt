@@ -403,3 +403,7 @@ Mon 06 Feb 2023 03:36:23 AM UTC Change directory to raspberry_pi folder.
 Mon 06 Feb 2023 03:36:25 AM UTC Start initial_boot_update.py script
 Mon 06 Feb 2023 03:36:30 AM UTC Start main.py script
 Mon 06 Feb 2023 03:40:06 AM UTC Start main.py script
+Mon 06 Feb 2023 12:32:29 PM UTC Delay script execution for 3s
+Mon 06 Feb 2023 12:32:32 PM UTC Change directory to raspberry_pi folder.
+Mon 06 Feb 2023 12:32:34 PM UTC Start initial_boot_update.py script
+Mon 06 Feb 2023 12:32:42 PM UTC Start main.py script

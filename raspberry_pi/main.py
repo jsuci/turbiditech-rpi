@@ -182,23 +182,6 @@ def check_water(delay=5):
       print('invalid results, check again.')
 
 
-def admin_update(is_cln):
-  prob = random.randint(80,99)
-  capture_image()
-
-  if is_cln == True:
-    GPIO.output(12, GPIO.HIGH)
-    details = f'{DEVICE_NAME.upper()} has detected {prob}% CLEAN water status. Turning ON valve.'
-    post_water_valve_status('clean', 'on', details)
-
-  else:
-    GPIO.output(12, GPIO.LOW)
-    details = f'{DEVICE_NAME.upper()} has detected {prob}% DIRTY water status. Turning OFF valve.'
-    post_water_valve_status('dirty', 'off', details)
-
-
-
-
 
 # send / receive data from API
 def get_device_record():
@@ -211,21 +194,6 @@ def get_device_record():
     w_stat = data['water_status']
 
     return v_stat, w_stat
-  else:
-    return r.status_code
-
-
-def get_admin_panel():
-  url = f'https://turbiditech.fly.dev/api/admin-update/22'
-  r = requests.get(url, auth=(EMAIL, PASSWORD))
-
-  if r.status_code == 200:
-    data = r.json()
-    is_mnl = data['manual']
-    is_cln = data['is_clean']
-    is_hld = data['on_hold']
-
-    return is_mnl, is_cln, is_hld
   else:
     return r.status_code
 
