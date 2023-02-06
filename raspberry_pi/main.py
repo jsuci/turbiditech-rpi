@@ -274,97 +274,63 @@ def main():
   count_detection = 0
 
   while True:
-    # check admin-panel first
-    is_mnl, is_cln, is_hld = get_admin_panel()
-
-    if is_cln == True:
-       device_w_stat = 'clean'
-    else:
-       device_w_stat = 'dirty'
-
-    print('getting server device record')
-    server_v_stat, server_w_status = get_device_record()
 
     # get current device valve status
     if GPIO.input(12) == 1:
-      device_v_stat = 'on'
+        device_v_stat = 'on'
     else:
-      device_v_stat = 'off'
-
-
-    if is_mnl == True:
-        if server_v_stat == 'off':
-          GPIO.output(12, GPIO.LOW)
-          print('valve is off, skipping detection')
-        else:
-          if server_v_stat != device_v_stat:
-            print('server and device valve status is different, check water status')
-            admin_update(is_cln)
-          else:
-            print('server and device valve status are the same')
-            if server_w_status != device_w_stat:
-              print('server and device water status is different, check water status')
-              admin_update(is_cln)
-            else:
-              print('server and device water status is the same, skipping')
+        device_v_stat = 'off'
+    
+    print(f'valve has been manually turned {server_v_stat.upper()}')
+    
+    if (server_v_stat == 'off'):
+        GPIO.output(12, GPIO.LOW)
+        print(f'current valve GPIO pin set to {GPIO.input(12)} (OFF)')
+        print(f'skipping water turbidity detection as of this moment.')
     else:
-        
-        # get current device valve status
-        if GPIO.input(12) == 1:
-            device_v_stat = 'on'
-        else:
-            device_v_stat = 'off'
-        
-        print(f'valve has been manually turned {server_v_stat.upper()}')
-        
-        if (server_v_stat == 'off'):
-            GPIO.output(12, GPIO.LOW)
-            print(f'current valve GPIO pin set to {GPIO.input(12)}')
-            print(f'skipping water turbidity detection as of this moment.')
-        else:
 
-            if server_v_stat == 'on':
-                print('performing water turbidity detection.')
-                device_w_stat, prob = get_device_water_status()
-                
-                print(f'device has detected {prob}% {device_w_stat.upper()} water.')
+        if server_v_stat == 'on':
+            print('performing water turbidity detection.')
+            device_w_stat, prob = get_device_water_status()
+            
+            print(f'device has detected {prob}% {device_w_stat.upper()} water.')
 
-                # to prevent same results being uploaded to server
-                if server_w_status == device_w_stat and server_v_stat == device_v_stat:
-                    if count_detection == 0:
-
-                        details = f'{DEVICE_NAME.upper()} has detected {prob}% {device_w_stat.upper()} water status. Turning {device_v_stat.upper()} valve.'
-                        print('sending results to server')
-                        post_water_valve_status(w_stat=device_w_stat, v_stat=device_v_stat, details=details)
-
-                        # set count detection to 1
-                        print('set count_detection to 1')
-                        count_detection = 1
-                    else:
-                        print('both server and device water status are CLEAN, already sent same results to server. skipping sending data')
-
-                else:
-                    # detection is clean
-                    if device_w_stat == 'clean':
-                        GPIO.output(12, GPIO.HIGH)
-                        print(f'valve GPIO pin set to {GPIO.input(12)} (ON)')
-
-                        device_v_stat = 'on'
-
-                    # detection is dirty
-                    if device_w_stat == 'dirty':
-                        GPIO.output(12, GPIO.LOW)
-                        print(f'valve GPIO pin set to {GPIO.input(12)} (OFF)')
-
-                        device_v_stat = 'off'
+            # to prevent same results being uploaded to server
+            if server_w_status == device_w_stat and server_v_stat == device_v_stat:
+                if count_detection == 0:
 
                     details = f'{DEVICE_NAME.upper()} has detected {prob}% {device_w_stat.upper()} water status. Turning {device_v_stat.upper()} valve.'
                     print('sending results to server')
                     post_water_valve_status(w_stat=device_w_stat, v_stat=device_v_stat, details=details)
 
-                    # set count detection to 0
-                    print('set count_detection to 0')
-                    count_detection = 0
+                    # set count detection to 1
+                    print('set count_detection to 1')
+                    count_detection = 1
+                else:
+                    print('both server and device water status are CLEAN, already sent same results to server. skipping sending data')
+
+            else:
+                # detection is clean
+                if device_w_stat == 'clean':
+                    GPIO.output(12, GPIO.HIGH)
+                    print(f'valve GPIO pin set to {GPIO.input(12)} (ON)')
+
+                    device_v_stat = 'on'
+
+                # detection is dirty
+                if device_w_stat == 'dirty':
+                    GPIO.output(12, GPIO.LOW)
+                    print(f'valve GPIO pin set to {GPIO.input(12)} (OFF)')
+
+                    device_v_stat = 'off'
+
+                details = f'{DEVICE_NAME.upper()} has detected {prob}% {device_w_stat.upper()} water status. Turning {device_v_stat.upper()} valve.'
+                print('sending results to server')
+                post_water_valve_status(w_stat=device_w_stat, v_stat=device_v_stat, details=details)
+
+                # set count detection to 0
+                print('set count_detection to 0')
+                count_detection = 0
 
     print('perform detection again in 5 seconds.\n\n')
     sleep(5)
