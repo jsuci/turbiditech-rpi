@@ -84,3 +84,29 @@ sudo systemctl status turbiditech.service
 
 6. You can also stop, start or restart the service using the command:
 sudo systemctl [stop|start|restart] myscript.service
+
+
+#mplayer
+mplayer tv:// -tv driver=v4l2:device=/dev/video0:width=320:height=240
+
+#mplayer save video
+mplayer tv:// -tv driver=v4l2:device=/dev/video1width=320:height=240 -dumpstream -endpos 120 -dumpfile clean_1.mp4
+
+
+#turn on wifi automatically
+su -c "wpa_passphrase PLDTHOMEFIBR900d0 PLDTWIFIg4egf > /etc/wpa_supplicant/wpa_supplicant.conf"
+
+
+#In /etc/network/interfaces I do use the following config for a wlan0 configuration:
+# device wlan0
+auto wlxe0e1a95e7dde
+allow-hotplug wlxe0e1a95e7dde
+iface wlxe0e1a95e7dde inet static
+address 192.168.6.50
+netmask 255.255.255.0
+gateway 192.168.1.1
+dns-nameservers 8.8.8.8 8.8.4.4
+wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+#  Disable power saving on compatible chipsets (prevents SSH/connection dropouts )
+wireless-mode Managed
+wireless-power off
