@@ -275,6 +275,15 @@ def main():
 
   while True:
 
+    print('getting server device record')
+    server_v_stat, server_w_status = get_device_record()
+
+    # get current device valve status
+    if GPIO.input(12) == 1:
+      device_v_stat = 'on'
+    else:
+      device_v_stat = 'off'
+    
     # get current device valve status
     if GPIO.input(12) == 1:
         device_v_stat = 'on'
@@ -285,7 +294,7 @@ def main():
     
     if (server_v_stat == 'off'):
         GPIO.output(12, GPIO.LOW)
-        print(f'current valve GPIO pin set to {GPIO.input(12)} (OFF)')
+        print(f'current valve GPIO pin set to {GPIO.input(12)}')
         print(f'skipping water turbidity detection as of this moment.')
     else:
 
@@ -334,9 +343,6 @@ def main():
 
     print('perform detection again in 5 seconds.\n\n')
     sleep(5)
-
-
-
 
 
 if __name__ == "__main__":
