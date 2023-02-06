@@ -390,6 +390,7 @@ def main():
 
                         device_v_stat = 'off'
 
+                    details = f'{DEVICE_NAME.upper()} has detected {prob}% {device_w_stat.upper()} water status. Turning {device_v_stat.upper()} valve.'
                     print('sending results to server')
                     post_water_valve_status(w_stat=device_w_stat, v_stat=device_v_stat, details=details)
 
