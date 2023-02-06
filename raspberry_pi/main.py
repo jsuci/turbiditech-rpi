@@ -123,8 +123,8 @@ def classify_image(interpreter, image):
     
 
 def check_water(delay=5):
-  label_path = '../model/labels.txt'
-  model_path = '../model/model.tflite'
+  label_path = 'model/labels.txt'
+  model_path = 'model/model.tflite'
 
   # set labels
   labels = load_labels(label_path)
